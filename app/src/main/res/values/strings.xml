@@ -2,7 +2,7 @@
     <string name="app_name">ChatGPT文本搜索器</string>
 
     <string name="qrcode">二维码</string>
-    <string name="receiving_shared_label">查询文本</string>
+    <string name="text_searcher_label">ChatGPT·文本搜索</string>
     <string name="system_prompt">根据用户输入来输出其意义或字面意思</string>
     <string name="message_template">$text</string>
     <string name="more_options">更多选项</string>

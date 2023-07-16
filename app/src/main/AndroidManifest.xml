@@ -30,7 +30,7 @@
         <activity
             android:name=".ui.SharedReceiverActivity"
             android:exported="true"
-            android:label="@string/receiving_shared_label"
+            android:label="@string/text_searcher_label"
             android:launchMode="standard"
             android:theme="@style/AppTheme.Transparent">
             <intent-filter>
