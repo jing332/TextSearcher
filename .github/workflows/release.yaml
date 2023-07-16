@@ -6,8 +6,6 @@ on:
             - "master"
         paths:
             - "CHANGELOG.md"
-        paths-ignore:
-            - 'README.md'
     workflow_dispatch:
 
 jobs:
