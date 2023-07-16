@@ -4,6 +4,5 @@
 
 # ScreenShots
 
-<img height="150px" src="image/1.jpg" title="主程序界面"/>
--
-<img src="image/2.jpg" height="150px" title="阅读界面">
+<img src="images/1.jpg" height="150px" title="主程序界面"/>
+<img src="images/2.jpg" height="150px" title="阅读界面">
