@@ -1,4 +1,4 @@
-package com.github.jing332.dict_searcher.ui.theme
+package com.github.jing332.text_searcher.ui.theme
 
 import android.app.Activity
 import android.os.Build

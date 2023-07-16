@@ -1,4 +1,4 @@
-package com.github.jing332.dict_searcher.ui
+package com.github.jing332.text_searcher.ui
 
 import androidx.lifecycle.ViewModel
 import com.aallam.openai.api.BetaOpenAI

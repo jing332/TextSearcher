@@ -1,4 +1,4 @@
-package com.github.jing332.dict_searcher.const
+package com.github.jing332.text_searcher.const
 
 object ConfigConst {
     const val KEY_TEST_TEXT = "test_text"

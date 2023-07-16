@@ -43,15 +43,14 @@
 #-renamesourcefileattribute SourceFile
 
 ## Rhino
--keep class javax.script.** { *; }
--keep class com.sun.script.javascript.** { *; }
--keep class org.mozilla.javascript.** { *; }
--keep class com.script.javascript.** { *; }
+#-keep class javax.script.** { *; }
+#-keep class com.sun.script.javascript.** { *; }
+#-keep class org.mozilla.javascript.** { *; }
+#-keep class com.script.javascript.** { *; }
 
-## 插件相关
--keep class com.github.jing332.tts_server_android.help.plugin.ext.** { *; }
--keep class cn.hutool.crypto.** { *; }
--keep class cn.hutool.core.** { *; }
+#-keep class cn.hutool.crypto.** { *; }
+#-keep class cn.hutool.core.** { *; }
+-keep class com.aallam.openai.api.exception.** { *; }
 
 #-------------- 去掉所有打印 -------------
 

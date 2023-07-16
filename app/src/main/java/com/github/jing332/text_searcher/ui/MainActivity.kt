@@ -1,4 +1,4 @@
-package com.github.jing332.dict_searcher.ui
+package com.github.jing332.text_searcher.ui
 
 import android.content.Context
 import android.content.Intent
@@ -49,9 +49,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import com.funny.data_saver.core.LocalDataSaver
-import com.github.jing332.dict_searcher.R
-import com.github.jing332.dict_searcher.help.AppConfig
-import com.github.jing332.dict_searcher.ui.theme.TxtSearcher
+import com.github.jing332.text_searcher.R
+import com.github.jing332.text_searcher.help.AppConfig
+import com.github.jing332.text_searcher.ui.theme.TxtSearcher
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {

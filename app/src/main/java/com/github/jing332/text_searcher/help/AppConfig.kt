@@ -1,11 +1,11 @@
-package com.github.jing332.dict_searcher.help
+package com.github.jing332.text_searcher.help
 
 import android.content.Context
 import com.funny.data_saver.core.DataSaverPreferences
 import com.funny.data_saver.core.mutableDataSaverStateOf
-import com.github.jing332.dict_searcher.R
-import com.github.jing332.dict_searcher.app
-import com.github.jing332.dict_searcher.const.ConfigConst
+import com.github.jing332.text_searcher.R
+import com.github.jing332.text_searcher.app
+import com.github.jing332.text_searcher.const.ConfigConst
 
 
 object AppConfig {

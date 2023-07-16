@@ -1,4 +1,4 @@
-package com.github.jing332.dict_searcher.ui.widgets
+package com.github.jing332.text_searcher.ui.widgets
 
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable

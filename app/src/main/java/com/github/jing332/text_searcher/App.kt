@@ -1,4 +1,4 @@
-package com.github.jing332.dict_searcher
+package com.github.jing332.text_searcher
 
 import android.app.Application
 

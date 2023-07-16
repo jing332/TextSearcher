@@ -34,11 +34,11 @@ val version = "1.${releaseTime()}"
 val gitCommits: Int = executeCommand("git rev-list HEAD --count").trim().toInt()
 
 android {
-    namespace = "com.github.jing332.dict_searcher"
+    namespace = "com.github.jing332.text_searcher"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.github.jing332.dict_searcher"
+        applicationId = "com.github.jing332.text_searcher"
         minSdk = 21
         targetSdk = 33
         versionCode = gitCommits
