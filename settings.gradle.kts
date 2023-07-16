@@ -15,5 +15,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "txtSearcher"
+rootProject.name = "TextSearcher"
 include(":app")
