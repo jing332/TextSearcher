@@ -1,3 +1,4 @@
+*.jks
 *.iml
 .gradle
 /local.properties
@@ -14,6 +15,4 @@
 .cxx
 local.properties
 
-# Project exclude paths
-/app/
 /gradle/
