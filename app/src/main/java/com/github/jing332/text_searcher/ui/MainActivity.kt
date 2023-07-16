@@ -52,6 +52,7 @@ import com.funny.data_saver.core.LocalDataSaver
 import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.help.AppConfig
 import com.github.jing332.text_searcher.ui.theme.TxtSearcher
+import com.github.jing332.text_searcher.ui.widgets.TransparentSystemBars
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {
@@ -101,18 +102,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun TransparentSystemBars() {
-    val systemUiController = rememberSystemUiController()
-    val useDarkIcons = !isSystemInDarkTheme()
-    SideEffect {
-        systemUiController.setSystemBarsColor(
-            color = Color.Transparent,
-            darkIcons = useDarkIcons,
-            isNavigationBarContrastEnforced = false,
-        )
-    }
-}
 
 
 private fun doTest(context: Context, text: String) {

@@ -9,6 +9,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.github.jing332.text_searcher.ui.theme.TxtSearcher
+import com.github.jing332.text_searcher.ui.widgets.TransparentSystemBars
 
 class SharedReceiverActivity : ComponentActivity() {
     private val receivingType = "text/plain"
@@ -37,12 +39,15 @@ class SharedReceiverActivity : ComponentActivity() {
             }
         }
         setContent {
-            var isVisible by remember { mutableStateOf(true) }
+            TxtSearcher {
+                TransparentSystemBars()
+                var isVisible by remember { mutableStateOf(true) }
 
-            if (isVisible)
-                SearcherDialog({ isVisible = false }, inputText)
-            else
-                finish()
+                if (isVisible)
+                    SearcherDialog({ isVisible = false }, inputText)
+                else
+                    finish()
+            }
         }
     }
 
