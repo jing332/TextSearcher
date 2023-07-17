@@ -27,7 +27,7 @@ class SearchDialogViewModel : ViewModel() {
         msg: String,
         token: String,
         systemPrompt: String,
-        model: String = "gpt-3.5-turbo"
+        model: String
     ) {
         val openAI = OpenAI(
             token = token,
@@ -58,12 +58,11 @@ class SearchDialogViewModel : ViewModel() {
         }
     }
 
-    @OptIn(BetaOpenAI::class)
     fun requestChatGPT(
         msg: String,
         token: String,
         systemPrompt: String,
-        model: String = "gpt-3.5-turbo"
+        model: String
     ) {
         if (isLoading) return
 

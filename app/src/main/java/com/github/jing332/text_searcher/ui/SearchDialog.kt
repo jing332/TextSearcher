@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
@@ -57,8 +58,6 @@ import java.net.URLEncoder
 
 @Composable
 fun TabIndicator(color: Color, modifier: Modifier = Modifier) {
-    // Draws a rounded rectangular with border around the Tab, with a 5.dp padding from the edges
-    // Color is passed in as a parameter [color]
     Box(
         modifier
             .padding(5.dp)
@@ -67,7 +66,6 @@ fun TabIndicator(color: Color, modifier: Modifier = Modifier) {
     )
 }
 
-@Suppress("BlockingMethodInNonBlockingContext")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
@@ -99,7 +97,6 @@ fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
                         )
                     }
                 }
-
                 HorizontalPager(pagerState, userScrollEnabled = false) {
                     if (it == 0) {
                         ChatGPTScreen(
@@ -127,20 +124,19 @@ fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
                     }
                 }
 
-
-                Box(modifier = Modifier.align(Alignment.End)) {
-                    Row {
-                        IconButton(onClick = {
-                            isRequestState.value = true
-                        }) {
-                            Icon(Icons.Filled.Refresh, contentDescription = "Refresh")
-                        }
-                        Spacer(modifier = Modifier.width(12.dp))
-                        IconButton(onClick = { onDismissRequest() }) {
-                            Icon(Icons.Filled.Close, contentDescription = "Close")
-                        }
-                    }
-                }
+                /* Box(modifier = Modifier.align(Alignment.End)) {
+                     Row {
+                         IconButton(onClick = {
+                             isRequestState.value = true
+                         }) {
+                             Icon(Icons.Filled.Refresh, contentDescription = "Refresh")
+                         }
+                         Spacer(modifier = Modifier.width(12.dp))
+                         IconButton(onClick = { onDismissRequest() }) {
+                             Icon(Icons.Filled.Close, contentDescription = "Close")
+                         }
+                     }
+                 }*/
             }
         }
     }
@@ -163,7 +159,8 @@ private fun ChatGPTScreen(
             vm.requestChatGPT(
                 msg = inputText,
                 token = AppConfig.openAiApiKey.value,
-                systemPrompt = AppConfig.systemPrompt.value
+                model = AppConfig.openAiModel.value,
+                systemPrompt = AppConfig.systemPrompt.value,
             )
         }
     }
@@ -177,17 +174,13 @@ private fun ChatGPTScreen(
     Column {
         Column(modifier.verticalScroll(scrollState)) {
             SelectionContainer {
-                Text(text = inputText, style = MaterialTheme.typography.titleMedium)
+                Text(text = inputText, style = MaterialTheme.typography.titleMedium, maxLines = 1)
             }
 
-            Divider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 2.dp)
-            )
             SelectionContainer {
                 Text(text = vm.result, style = MaterialTheme.typography.bodyMedium)
             }
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

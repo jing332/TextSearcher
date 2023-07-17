@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,6 +35,7 @@ import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.help.AppConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.concurrent.CancellationException
 
 
 @Composable
@@ -59,14 +59,29 @@ private fun ModelSelectionScreen(
     vm: ModelSelectionViewModel = viewModel()
 ) {
     val scope = rememberCoroutineScope()
+    var errorMessage by remember { mutableStateOf("") }
+
     LaunchedEffect(key1 = vm.hashCode(), block = {
         scope.launch(Dispatchers.IO) {
-            vm.loadModels(AppConfig.openAiApiKey.value, AppConfig.openAiModel.value)
-            withMain {
-                vm.lazyListState.scrollToItem(vm.models.indexOf(currentModel))
+            try {
+                vm.loadModels(AppConfig.openAiApiKey.value, AppConfig.openAiModel.value)
+                withMain {
+                    val i = vm.models.indexOf(currentModel)
+                    if (i >= 0) vm.lazyListState.scrollToItem(i)
+                }
+            } catch (_: CancellationException) {
+            } catch (e: Exception) {
+                errorMessage = e.toString()
             }
         }
     })
+
+    if (errorMessage.isNotEmpty())
+        Text(
+            text = errorMessage,
+            modifier = Modifier.padding(8.dp),
+            color = MaterialTheme.colorScheme.error
+        )
 
     LazyColumn(state = vm.lazyListState) {
         items(vm.models, { it }) {
@@ -79,7 +94,10 @@ private fun ModelSelectionScreen(
                         onClick = { onModelChange(it) }
                     )
             ) {
-                RadioButton(selected = it == currentModel, onClick = { /*TODO*/ })
+                RadioButton(
+                    selected = it == currentModel,
+                    onClick = { onModelChange(it) },
+                )
                 Text(
                     text = it,
                     style = MaterialTheme.typography.titleSmall,
