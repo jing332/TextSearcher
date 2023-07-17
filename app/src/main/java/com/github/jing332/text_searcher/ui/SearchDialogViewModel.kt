@@ -69,8 +69,8 @@ class SearchDialogViewModel : ViewModel() {
 
         result = ""
         isLoading = true
-        try {
-            viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
                 requestInternal(
                     msg,
                     token,
@@ -78,12 +78,11 @@ class SearchDialogViewModel : ViewModel() {
                     model
                 )
                 isLoading = false
+            } catch (e: RateLimitException) {
+                result = "RateLimit: 您已被OpenAI限制，请检查可用额度、更换代理或稍后重试。"
+            } catch (e: Exception) {
+                result = "错误: $e"
             }
-        } catch (e: RateLimitException) {
-            result = "RateLimit: 您已被OpenAI限制，请检查可用额度、更换代理或稍后重试。"
-        } catch (e: Exception) {
-            result = "错误: $e"
         }
-
     }
 }

@@ -17,6 +17,12 @@ object AppConfig {
         initialValue = ""
     )
 
+    val openAiModel = mutableDataSaverStateOf(
+        dataSaverInterface = dataSaverPref,
+        key = ConfigConst.KEY_OPEN_AI_MODEL,
+        initialValue = ConfigConst.VALUE_OPEN_AI_MODEL
+    )
+
     val msgTemplate = mutableDataSaverStateOf(
         dataSaverInterface = dataSaverPref,
         key = ConfigConst.KEY_MSG_TEMPLATE,
@@ -44,5 +50,8 @@ object AppConfig {
 
         if (testText.value.isEmpty())
             testText.value = context.getString(R.string.test_text)
+
+        if (openAiModel.value.isEmpty())
+            openAiModel.value = ConfigConst.VALUE_OPEN_AI_MODEL
     }
 }
