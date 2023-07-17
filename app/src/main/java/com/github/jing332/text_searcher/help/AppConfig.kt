@@ -35,6 +35,18 @@ object AppConfig {
         initialValue = ""
     )
 
+    var gptFontSize = mutableDataSaverStateOf(
+        dataSaverInterface = dataSaverPref,
+        key = ConfigConst.KEY_GPT_FONT_SIZE,
+        initialValue = ConfigConst.VALUE_GPT_FONT_SIZE
+    )
+
+    var gptLineHeightScale = mutableDataSaverStateOf(
+        dataSaverInterface = dataSaverPref,
+        key = ConfigConst.KEY_GPT_LINE_HEIGHT_SCALE,
+        initialValue = ConfigConst.VALUE_GPT_LINE_HEIGHT_SCALE
+    )
+
     val testText = mutableDataSaverStateOf(
         dataSaverInterface = dataSaverPref,
         key = ConfigConst.KEY_TEST_TEXT,

@@ -18,4 +18,9 @@
     <string name="loading">加载中</string>
     <string name="password_visible">显示密码</string>
     <string name="password_hide">隐藏密码</string>
+    <string name="appearance_settings">外观设置</string>
+    <string name="font_size">字体大小：%s</string>
+    <string name="line_height">行间隔：%s</string>
+    <string name="expandble_text_more">" 展开"</string>
+    <string name="expandble_text_less">" 收起"</string>
 </resources>
