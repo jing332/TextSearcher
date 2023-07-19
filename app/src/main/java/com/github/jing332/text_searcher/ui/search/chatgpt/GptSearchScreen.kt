@@ -55,26 +55,28 @@ fun GptSearchScreen(
 ) {
     val entity = src.sourceEntity as ChatGptSourceEntity
 
-        ChatGPTScreen(
-            state = state,
-            message = entity.messageTemplate.replace("\$text", text),
-            token = entity.apiKey,
-            model = entity.model,
-            systemPrompt = entity.systemPrompt,
+    ChatGPTScreen(
+        id = src.id,
+        state = state,
+        message = entity.messageTemplate.replace("\$text", text),
+        token = entity.apiKey,
+        model = entity.model,
+        systemPrompt = entity.systemPrompt,
 
-            titleAppearance = entity.titleAppearance,
-            contentAppearance = entity.contentAppearance,
-            onTitleAppearanceChange = {
-                onEntityChange(entity.copy(titleAppearance = it))
-            },
-            onContentAppearanceChange = {
-                onEntityChange(entity.copy(contentAppearance = it))
-            }
-        )
+        titleAppearance = entity.titleAppearance,
+        contentAppearance = entity.contentAppearance,
+        onTitleAppearanceChange = {
+            onEntityChange(entity.copy(titleAppearance = it))
+        },
+        onContentAppearanceChange = {
+            onEntityChange(entity.copy(contentAppearance = it))
+        }
+    )
 }
 
 @Composable
 private fun ChatGPTScreen(
+    id: Long,
     modifier: Modifier = Modifier,
     state: SearchSourceState,
     token: String,
@@ -85,7 +87,7 @@ private fun ChatGPTScreen(
     contentAppearance: ChatGptAppearance,
     onTitleAppearanceChange: (ChatGptAppearance) -> Unit,
     onContentAppearanceChange: (ChatGptAppearance) -> Unit,
-    vm: GptSearchScreenViewModel = viewModel(key = token)
+    vm: GptSearchScreenViewModel = viewModel(key = id.toString())
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current

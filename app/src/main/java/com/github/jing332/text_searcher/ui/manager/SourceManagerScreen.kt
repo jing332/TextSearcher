@@ -1,6 +1,7 @@
 package com.github.jing332.text_searcher.ui.manager
 
 import android.os.Bundle
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Menu
@@ -107,6 +109,7 @@ fun SourceManagerScreen(drawerState: DrawerState) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ListScreen(modifier: Modifier, vm: SourceManagerViewModel = viewModel()) {
     val navController = LocalNavController.current
@@ -119,7 +122,8 @@ private fun ListScreen(modifier: Modifier, vm: SourceManagerViewModel = viewMode
             Item(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 2.dp, horizontal = 16.dp),
+                    .padding(vertical = 2.dp, horizontal = 16.dp)
+                    .animateItemPlacement(),
                 name = it.name,
                 type = it.sourceEntity.type(),
                 onClick = {
@@ -132,7 +136,9 @@ private fun ListScreen(modifier: Modifier, vm: SourceManagerViewModel = viewMode
                 },
                 onDelete = {
                     appDb.searchSource.delete(it)
-                }
+                },
+                onUpMove = { vm.upMove(it) },
+                onDownMove = { vm.downMove(it) }
             )
         }
     }
@@ -145,8 +151,11 @@ private fun Item(
     name: String,
     type: String,
     onClick: () -> Unit,
-    onDelete: () -> Unit
-) {
+    onDelete: () -> Unit,
+    onUpMove: () -> Unit,
+    onDownMove: () -> Unit,
+
+    ) {
     ElevatedCard(modifier = modifier, onClick = onClick) {
         ConstraintLayout(
             modifier
@@ -231,6 +240,18 @@ private fun Item(
                                 onClick = { showOptions = false }
                             )
                         })
+
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text(stringResource(R.string.up_move)) },
+                        onClick = { onUpMove() },
+                        leadingIcon = { Icon(Icons.Default.ArrowUpward, null) }
+                    )
+
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text(stringResource(R.string.down_move)) },
+                        onClick = { onDownMove() },
+                        leadingIcon = { Icon(Icons.Default.ArrowUpward, null) }
+                    )
                 }
             }
 

@@ -42,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -92,10 +93,10 @@ fun BaseSearchDialog(onDismissRequest: () -> Unit, content: @Composable () -> Un
 @Composable
 fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
     BaseSearchDialog(onDismissRequest = onDismissRequest) {
-        val sourceList = remember { appDb.searchSource.all }
-        val pages = remember { sourceList.map { it.name } }
+        val sourceList = rememberSaveable { appDb.searchSource.all }
+        val pages = rememberSaveable { sourceList.map { it.name } }
         val scope = rememberCoroutineScope()
-        val sourceState = remember { SearchSourceState() }
+
         Column {
             val pagerState = rememberPagerState { pages.size }
             TabRow(selectedTabIndex = pagerState.currentPage, indicator = { tabPositions ->
@@ -110,7 +111,7 @@ fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
                         selected = index == pagerState.currentPage,
                         onClick = {
                             scope.launch {
-                                pagerState.scrollToPage(index)
+                                pagerState.animateScrollToPage(index)
                             }
                         },
                     )
@@ -118,7 +119,9 @@ fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
             }
             HorizontalPager(pagerState, userScrollEnabled = false) {
                 val src = remember { sourceList[it] }
-                src.sourceEntity.SearchScreen(src = src, text = inputText, state = sourceState)
+                val state = rememberSaveable { SearchSourceState() }
+
+                src.sourceEntity.SearchScreen(src = src, text = inputText, state = state)
             }
         }
     }

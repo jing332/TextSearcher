@@ -44,4 +44,6 @@
     <string name="system_default_font">系统默认字体</string>
     <string name="chatgpt_search_source_name">ChatGPT搜索源</string>
     <string name="error_open_ai_api_key_empty">错误: 请填写OpenAI API 密钥</string>
+    <string name="up_move">上移</string>
+    <string name="down_move">下移</string>
 </resources>
