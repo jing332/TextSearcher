@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlaylistAdd
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,12 +27,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,14 +50,53 @@ import com.github.jing332.text_searcher.ui.AppNavRoutes
 import com.github.jing332.text_searcher.ui.LocalNavController
 import com.github.jing332.text_searcher.ui.LocalSnackbarHostState
 import com.github.jing332.text_searcher.ui.navigateSingleTop
+import com.github.jing332.text_searcher.ui.widgets.ErrorDialog
+import com.github.jing332.tts_dict_editor.ui.replace.ConfigImportBottomSheet
+import com.github.jing332.tts_dict_editor.ui.replace.ConfigImportSelectDialog
 import kotlinx.coroutines.launch
 import me.saket.cascade.CascadeDropdownMenu
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SourceManagerScreen(drawerState: DrawerState) {
+fun SourceManagerScreen(drawerState: DrawerState, vm: SourceManagerViewModel = viewModel()) {
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
+    var showConfigExport by remember { mutableStateOf("") }
+    if (showConfigExport.isNotEmpty())
+        ConfigExportBottomSheet(json = showConfigExport) {
+            showConfigExport = ""
+        }
+
+    var errorMessageDialog by remember { mutableStateOf<Throwable?>(null) }
+    if (errorMessageDialog != null)
+        ErrorDialog(errorMessageDialog) {
+            errorMessageDialog = null
+        }
+
+    var showConfigImport by rememberSaveable { mutableStateOf(false) }
+    var importSelectDialog by remember { mutableStateOf("") }
+    if (importSelectDialog.isNotEmpty()) {
+        val list = try {
+            vm.configImport(importSelectDialog)
+        } catch (e: Exception) {
+            importSelectDialog = ""
+            errorMessageDialog = e
+            return
+        }
+        ConfigImportSelectDialog(list = list, onConfirm = {
+            vm.configImport(it)
+            importSelectDialog = ""
+            showConfigImport = false
+        }) {
+            importSelectDialog = ""
+        }
+    }
+
+    if (showConfigImport)
+        ConfigImportBottomSheet(onImportFromJson = {
+            importSelectDialog = it
+        }, onDismiss = { showConfigImport = false })
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -68,29 +108,49 @@ fun SourceManagerScreen(drawerState: DrawerState) {
                 },
                 actions = {
                     var showAddMenu by remember { mutableStateOf(false) }
-                    if (showAddMenu)
-                        CascadeDropdownMenu(
-                            expanded = showAddMenu,
-                            onDismissRequest = { showAddMenu = false }) {
-                            androidx.compose.material3.DropdownMenuItem(
-                                text = { Text("ChatGPT") },
-                                onClick = {
-                                    navController.navigateSingleTop(
-                                        AppNavRoutes.SourceEdit.route,
-                                        args = Bundle().apply {
-                                            putParcelable(
-                                                AppNavRoutes.SourceEdit.KEY_SOURCE,
-                                                SearchSource(sourceEntity = ChatGptSourceEntity())
-                                            )
-                                        })
-                                }
-                            )
+                    CascadeDropdownMenu(
+                        expanded = showAddMenu,
+                        onDismissRequest = { showAddMenu = false }) {
+                        DropdownMenuItem(
+                            text = { Text("ChatGPT") },
+                            onClick = {
+                                navController.navigateSingleTop(
+                                    AppNavRoutes.SourceEdit.route,
+                                    args = Bundle().apply {
+                                        putParcelable(
+                                            AppNavRoutes.SourceEdit.KEY_SOURCE,
+                                            SearchSource(sourceEntity = ChatGptSourceEntity())
+                                        )
+                                    })
+                            }
+                        )
 
-                            androidx.compose.material3.DropdownMenuItem(
-                                text = { Text("搜索引擎") },
-                                onClick = {}
-                            )
-                        }
+                        DropdownMenuItem(
+                            text = { Text("搜索引擎") },
+                            onClick = {}
+                        )
+                    }
+
+                    var showMoveOptions by remember { mutableStateOf(false) }
+                    CascadeDropdownMenu(
+                        expanded = showMoveOptions,
+                        onDismissRequest = { showMoveOptions = false }) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.config_import)) },
+                            onClick = {
+                                showMoveOptions = false
+                                showConfigImport = true
+                            }
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.config_export)) },
+                            onClick = {
+                                showMoveOptions = false
+                                showConfigExport = vm.configExport()
+                            }
+                        )
+                    }
 
                     IconButton(onClick = {
                         showAddMenu = true
@@ -98,6 +158,15 @@ fun SourceManagerScreen(drawerState: DrawerState) {
                         Icon(
                             Icons.Filled.PlaylistAdd,
                             contentDescription = stringResource(R.string.add_search_source)
+                        )
+                    }
+
+                    IconButton(onClick = {
+                        showMoveOptions = true
+                    }) {
+                        Icon(
+                            Icons.Default.MoreVert,
+                            contentDescription = stringResource(R.string.more_options)
                         )
                     }
                 }
@@ -114,9 +183,7 @@ fun SourceManagerScreen(drawerState: DrawerState) {
 private fun ListScreen(modifier: Modifier, vm: SourceManagerViewModel = viewModel()) {
     val navController = LocalNavController.current
     val sources by appDb.searchSource.flowAll.collectAsState(initial = listOf())
-    LaunchedEffect(vm.hashCode()) {
 
-    }
     LazyColumn(modifier) {
         items(sources, { it.id }) {
             Item(
@@ -222,7 +289,7 @@ private fun Item(
                                 tint = MaterialTheme.colorScheme.error
                             )
                         }, children = {
-                            androidx.compose.material3.DropdownMenuItem(
+                            DropdownMenuItem(
                                 text = {
                                     Text(
                                         stringResource(R.string.confirm_delete),
@@ -235,19 +302,19 @@ private fun Item(
                                     onDelete()
                                 }
                             )
-                            androidx.compose.material3.DropdownMenuItem(
+                            DropdownMenuItem(
                                 text = { Text(stringResource(R.string.cancel)) },
                                 onClick = { showOptions = false }
                             )
                         })
 
-                    androidx.compose.material3.DropdownMenuItem(
+                    DropdownMenuItem(
                         text = { Text(stringResource(R.string.up_move)) },
                         onClick = { onUpMove() },
                         leadingIcon = { Icon(Icons.Default.ArrowUpward, null) }
                     )
 
-                    androidx.compose.material3.DropdownMenuItem(
+                    DropdownMenuItem(
                         text = { Text(stringResource(R.string.down_move)) },
                         onClick = { onDownMove() },
                         leadingIcon = { Icon(Icons.Default.ArrowUpward, null) }

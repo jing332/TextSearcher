@@ -3,10 +3,24 @@ package com.github.jing332.text_searcher.ui.manager
 import androidx.lifecycle.ViewModel
 import com.github.jing332.text_searcher.data.appDb
 import com.github.jing332.text_searcher.data.entites.SearchSource
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlin.math.max
 import kotlin.math.min
 
 class SourceManagerViewModel() : ViewModel() {
+    companion object {
+        @OptIn(ExperimentalSerializationApi::class)
+        private val json by lazy {
+            Json {
+                prettyPrint = true
+                ignoreUnknownKeys = true
+                explicitNulls = false
+            }
+        }
+    }
+
     val models
         get() = appDb.searchSource.all
 
@@ -32,6 +46,18 @@ class SourceManagerViewModel() : ViewModel() {
         }
 
         appDb.searchSource.update(*list.toTypedArray())
+    }
+
+    fun configExport(): String {
+        return json.encodeToString(appDb.searchSource.all)
+    }
+
+    fun configImport(s: String): List<SearchSource> {
+        return json.decodeFromString(s)
+    }
+
+    fun configImport(list: List<SearchSource>) {
+        appDb.searchSource.insert(*list.toTypedArray())
     }
 
 }

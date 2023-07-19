@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 
 @Composable
@@ -66,8 +67,11 @@ fun ProgressIndicatorLoading(progressIndicatorSize: Dp, progressIndicatorColor: 
 }
 
 @Composable
-fun LoadingDialog(onDismissRequest: () -> Unit) {
-    Dialog(onDismissRequest = onDismissRequest) {
+fun LoadingDialog(onDismissRequest: () -> Unit, dismissOnBackPress: Boolean = false) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(dismissOnBackPress = dismissOnBackPress)
+    ) {
         Surface(
             tonalElevation = 4.dp,
             shape = MaterialTheme.shapes.medium,

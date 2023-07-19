@@ -9,12 +9,14 @@ import com.github.jing332.text_searcher.model.source.ChatGptSourceEntity
 import com.github.jing332.text_searcher.model.source.SourceEntity
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Parcelize
 @TypeConverters(SearchSource.Converters::class)
 @Entity(tableName = "search_sources")
+@Serializable
 data class SearchSource(
     @PrimaryKey(autoGenerate = false)
     val id: Long = System.currentTimeMillis(),

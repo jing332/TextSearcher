@@ -46,4 +46,15 @@
     <string name="error_open_ai_api_key_empty">错误: 请填写OpenAI API 密钥</string>
     <string name="up_move">上移</string>
     <string name="down_move">下移</string>
+    <string name="config_export">导出</string>
+    <string name="config_import">导入</string>
+    <string name="saved_to_file">已保存到文件：%s</string>
+    <string name="save_as_file">另存为文件</string>
+    <string name="copy">复制</string>
+    <string name="clipboard">剪贴板</string>
+    <string name="file">文件</string>
+    <string name="url">网络链接</string>
+    <string name="file_path">文件路径</string>
+    <string name="select_file">选择文件</string>
+    <string name="error">错误</string>
 </resources>
