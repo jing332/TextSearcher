@@ -17,6 +17,9 @@ interface SearchSourceDao {
     @get:Query("SELECT * FROM search_sources ORDER BY `order` ASC")
     val flowAll: Flow<List<SearchSource>>
 
+    @get:Query("SELECT COUNT(*) FROM search_sources")
+    val count:Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(vararg args: SearchSource)
 

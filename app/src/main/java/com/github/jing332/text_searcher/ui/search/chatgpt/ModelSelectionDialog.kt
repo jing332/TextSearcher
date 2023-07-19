@@ -25,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,12 +60,13 @@ private fun ModelSelectionScreen(
     vm: ModelSelectionViewModel = viewModel()
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     var errorMessage by remember { mutableStateOf("") }
 
     LaunchedEffect(key1 = vm.hashCode(), block = {
         scope.launch(Dispatchers.IO) {
             try {
-                vm.loadModels(AppConfig.openAiApiKey.value, AppConfig.openAiModel.value)
+                vm.loadModels(context, AppConfig.openAiApiKey.value, AppConfig.openAiModel.value)
                 withMain {
                     val i = vm.models.indexOf(currentModel)
                     if (i >= 0) vm.lazyListState.scrollToItem(i)

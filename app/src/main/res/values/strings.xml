@@ -42,4 +42,6 @@
     <string name="font">字体</string>
     <string name="choose_font">选择字体</string>
     <string name="system_default_font">系统默认字体</string>
+    <string name="chatgpt_search_source_name">ChatGPT搜索源</string>
+    <string name="error_open_ai_api_key_empty">错误: 请填写OpenAI API 密钥</string>
 </resources>

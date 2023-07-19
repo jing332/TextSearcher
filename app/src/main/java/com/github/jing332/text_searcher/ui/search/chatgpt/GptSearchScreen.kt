@@ -42,7 +42,6 @@ import com.github.jing332.text_searcher.data.entites.SearchSource
 import com.github.jing332.text_searcher.help.AppConfig
 import com.github.jing332.text_searcher.model.source.ChatGptAppearance
 import com.github.jing332.text_searcher.model.source.ChatGptSourceEntity
-import com.github.jing332.text_searcher.ui.search.SearchDialogViewModel
 import com.github.jing332.text_searcher.ui.search.SearchSourceState
 import com.github.jing332.text_searcher.ui.widgets.ExpandableText
 import kotlinx.coroutines.launch
@@ -85,7 +84,7 @@ private fun ChatGPTScreen(
     contentAppearance: ChatGptAppearance,
     onTitleAppearanceChange: (ChatGptAppearance) -> Unit,
     onContentAppearanceChange: (ChatGptAppearance) -> Unit,
-    vm: SearchDialogViewModel = viewModel(key = key)
+    vm: GptSearchScreenViewModel = viewModel(key = key)
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -97,6 +96,7 @@ private fun ChatGPTScreen(
         scope.launch {
             AppConfig.fillDefaultValues(context)
             vm.requestChatGPT(
+                context,
                 msg = text,
                 token = AppConfig.openAiApiKey.value,
                 model = AppConfig.openAiModel.value,

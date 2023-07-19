@@ -18,19 +18,29 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.funny.data_saver.core.LocalDataSaver
+import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.data.appDb
 import com.github.jing332.text_searcher.data.entites.SearchSource
 import com.github.jing332.text_searcher.help.AppConfig
+import com.github.jing332.text_searcher.model.source.ChatGptSourceEntity
 import com.github.jing332.text_searcher.ui.theme.TxtSearcherTheme
 import com.github.jing332.text_searcher.ui.widgets.TransparentSystemBars
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         AppConfig.fillDefaultValues(this)
+
+        if (appDb.searchSource.count == 0) {
+            appDb.searchSource.insert(
+                SearchSource(
+                    name = getString(R.string.chatgpt_search_source_name),
+                    sourceEntity = ChatGptSourceEntity()
+                )
+            )
+        }
 
         setContent {
             CompositionLocalProvider(

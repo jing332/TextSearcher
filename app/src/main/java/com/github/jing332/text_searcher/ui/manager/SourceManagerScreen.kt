@@ -169,8 +169,8 @@ private fun Item(
                     .wrapContentWidth()
                     .constrainAs(typeRef) {
                         top.linkTo(titleRef.bottom)
+                        linkTo(start = typeRef.start, end = titleRef.start, bias = 0f)
                         end.linkTo(titleRef.end)
-                        start.linkTo(titleRef.start)
                     }) {
                 Icon(
                     modifier = Modifier.align(Alignment.CenterVertically),
