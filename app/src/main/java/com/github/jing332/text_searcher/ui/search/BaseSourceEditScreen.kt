@@ -1,4 +1,4 @@
-package com.github.jing332.text_searcher.ui.home.edit
+package com.github.jing332.text_searcher.ui.search
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -35,10 +35,12 @@ import com.github.jing332.text_searcher.ui.LocalNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun BaseSourceEditScreen(
+fun BaseSourceEditScreen(
+    title: String,
     content: @Composable ColumnScope.() -> Unit,
     src: SearchSource,
-    onSave: (SearchSource) -> Unit
+    onSave: (SearchSource) -> Unit,
+    onTest: (String) -> Unit,
 ) {
     val navController = LocalNavController.current
     var name by remember { mutableStateOf(src.name) }
@@ -47,7 +49,7 @@ internal fun BaseSourceEditScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("")
+                    Text(title)
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -92,7 +94,9 @@ internal fun BaseSourceEditScreen(
                     label = { Text(stringResource(id = R.string.test)) },
                     leadingIcon = { Icon(Icons.Filled.BugReport, contentDescription = null) },
                     trailingIcon = {
-                        IconButton(onClick = { }) {
+                        IconButton(onClick = {
+                            onTest(testText)
+                        }) {
                             Icon(
                                 Icons.Filled.TextFields,
                                 contentDescription = stringResource(R.string.test),

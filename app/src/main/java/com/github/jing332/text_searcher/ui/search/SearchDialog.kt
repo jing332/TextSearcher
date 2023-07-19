@@ -55,10 +55,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.jing332.text_searcher.R
+import com.github.jing332.text_searcher.data.appDb
 import com.github.jing332.text_searcher.help.AppConfig
 import com.github.jing332.text_searcher.ui.widgets.ExpandableText
 import com.github.jing332.text_searcher.ui.widgets.LabelSlider
-import com.github.jing332.text_searcher.utils.StringUtils.uriEncode
 import com.google.accompanist.web.AccompanistWebChromeClient
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.WebView
@@ -76,285 +76,50 @@ fun TabIndicator(color: Color, modifier: Modifier = Modifier) {
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
+fun BaseSearchDialog(onDismissRequest: () -> Unit, content: @Composable () -> Unit) {
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(
             tonalElevation = 4.dp,
             shape = MaterialTheme.shapes.small,
         ) {
-            val pages = remember { listOf("ChatGPT", "Bing", "Baidu") }
-            val scope = rememberCoroutineScope()
-            val isRequestState = remember { mutableStateOf(true) }
-            Column {
-                val pagerState = rememberPagerState() { pages.size }
-                TabRow(selectedTabIndex = pagerState.currentPage, indicator = { tabPositions ->
-                    TabIndicator(
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
-                    )
-                }) {
-                    pages.forEachIndexed { index, title ->
-                        Tab(
-                            text = { Text(title) },
-                            selected = index == pagerState.currentPage,
-                            onClick = {
-                                scope.launch {
-                                    pagerState.scrollToPage(index)
-                                }
-                            },
-                        )
-                    }
-                }
-                HorizontalPager(pagerState, userScrollEnabled = false) {
-                    if (it == 0) {
-                        ChatGPTScreen(
-                            it.toString(),
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp),
-                            isRequestState,
-                            inputText,
-                        )
-                    } else if (it == 1) {
-                        WebViewScreen(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp),
-                            "https://cn.bing.com/search?q=${inputText.uriEncode()}"
-                        )
-                    } else if (it == 2) {
-                        WebViewScreen(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp),
-                            "https://www.baidu.com/s?wd=${inputText.uriEncode()}"
-                        )
-                    }
-                }
-            }
+            content()
         }
-    }
-}
-
-@Composable
-private fun ChatGPTScreen(
-    key: String,
-    modifier: Modifier,
-    isRequestState: MutableState<Boolean>,
-    inputText: String,
-    vm: SearchDialogViewModel = viewModel(key = key)
-) {
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-
-    fun request() {
-        scope.launch {
-            AppConfig.fillDefaultValues(context)
-            vm.requestChatGPT(
-                msg = inputText,
-                token = AppConfig.openAiApiKey.value,
-                model = AppConfig.openAiModel.value,
-                systemPrompt = AppConfig.systemPrompt.value,
-            )
-        }
-    }
-
-    if (isRequestState.value) {
-        request()
-        isRequestState.value = false
-    }
-
-    var gptAppearanceScreenVisible by remember { mutableStateOf(false) }
-    val scrollState = rememberScrollState()
-    Column(modifier.verticalScroll(scrollState)) {
-        Row(
-            modifier
-                .wrapContentWidth()
-                .align(Alignment.CenterHorizontally)
-                .clickable(
-                    enabled = true,
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = rememberRipple(bounded = true),
-                    onClick = { gptAppearanceScreenVisible = !gptAppearanceScreenVisible },
-                )
-        ) {
-            Text(text = stringResource(R.string.appearance_settings))
-            Icon(
-                modifier = Modifier.size(20.dp),
-                imageVector = Icons.Filled.Settings,
-                contentDescription = stringResource(R.string.appearance_settings),
-            )
-        }
-        if (gptAppearanceScreenVisible) ChatGPTAppearanceSettingsScreen(Modifier.animateContentSize())
-
-        val titleFontSize by remember { AppConfig.gptTitleFontSize }
-        val titleFontWeight by remember { AppConfig.gptTitleFontWeight }
-        val titleLineHeight by remember { AppConfig.gptTitleLineHeight }
-        ExpandableText(
-            text = inputText, style = MaterialTheme.typography.titleMedium,
-            fontSize = titleFontSize.sp,
-            lineHeight = titleFontSize.sp * titleLineHeight,
-            fontWeight = FontWeight(titleFontWeight)
-        )
-
-        Spacer(modifier = Modifier.height(2.dp))
-
-        val fontSize by remember { AppConfig.gptFontSize }
-        val fontWeight by remember { AppConfig.gptFontWeight }
-        val lineHeight by remember { AppConfig.gptLineHeightScale }
-
-        SelectionContainer {
-            Text(
-                text = vm.result,
-                style = MaterialTheme.typography.bodyMedium,
-                fontSize = fontSize.sp,
-                fontWeight = FontWeight(fontWeight),
-                lineHeight = fontSize.sp * lineHeight,
-            )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ChatGPTAppearanceSettingsScreen(modifier: Modifier = Modifier) {
-    OutlinedCard(modifier) {
+fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
+    BaseSearchDialog(onDismissRequest = onDismissRequest) {
+        val sourceList = remember { appDb.searchSource.all }
+        val pages = remember { sourceList.map { it.name } }
         val scope = rememberCoroutineScope()
-        val pages = remember { listOf("标题", "内容") }
-        val pagerState = rememberPagerState() { pages.size }
-        TabRow(selectedTabIndex = pagerState.currentPage, indicator = { tabPositions ->
-            TabIndicator(
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
-            )
-        }) {
-            pages.forEachIndexed { index, title ->
-                Tab(
-                    text = { Text(title) },
-                    selected = index == pagerState.currentPage,
-                    onClick = {
-                        scope.launch { pagerState.scrollToPage(index) }
-                    },
+        val sourceState = remember { SearchSourceState() }
+        Column {
+            val pagerState = rememberPagerState { pages.size }
+            TabRow(selectedTabIndex = pagerState.currentPage, indicator = { tabPositions ->
+                TabIndicator(
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
                 )
-            }
-        }
-        HorizontalPager(pagerState, userScrollEnabled = false) {
-            when (it) {
-                0 -> {
-                    TextStyleSettingsScreen(
-                        fontSize = AppConfig.gptTitleFontSize,
-                        lineHeight = AppConfig.gptTitleLineHeight,
-                        fontWeight = AppConfig.gptTitleFontWeight,
-                    )
-                }
-
-                1 -> {
-                    TextStyleSettingsScreen(
-                        fontSize = AppConfig.gptFontSize,
-                        lineHeight = AppConfig.gptLineHeightScale,
-                        fontWeight = AppConfig.gptFontWeight,
+            }) {
+                pages.forEachIndexed { index, title ->
+                    Tab(
+                        text = { Text(title) },
+                        selected = index == pagerState.currentPage,
+                        onClick = {
+                            scope.launch {
+                                pagerState.scrollToPage(index)
+                            }
+                        },
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun TextStyleSettingsScreen(
-    fontSize: MutableState<Int>,
-    fontWeight: MutableState<Int>,
-    lineHeight: MutableState<Float>
-) {
-    val context = LocalContext.current
-    var showFontSelectionDialog by remember { mutableStateOf(false) }
-    if (showFontSelectionDialog)
-        FontSelectionDialog { showFontSelectionDialog = false }
-
-    Column {
-        OutlinedTextField(
-            value = "", onValueChange = {},
-            readOnly = true,
-            enabled = false,
-            colors = TextFieldDefaults.colors(
-                disabledContainerColor = MaterialTheme.colorScheme.surface,
-                disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                disabledLabelColor = MaterialTheme.colorScheme.onSurface,
-                disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 2.dp)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = rememberRipple(bounded = true)
-                ) { showFontSelectionDialog = true },
-        )
-
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        var vFontWeight by remember { fontWeight }
-        var fontWeightLabel by remember {
-            mutableStateOf(
-                context.getString(R.string.font_weight, (vFontWeight / 100).toString())
-            )
-        }
-        LabelSlider(
-            modifier = Modifier.fillMaxWidth(),
-            value = (vFontWeight / 100).toFloat(),
-            onValueChange = {
-                vFontWeight = (it.toInt() * 100)
-                fontWeightLabel = when (vFontWeight) {
-                    FontWeight.Normal.weight -> context.getString(R.string.font_weight_normal)
-                    FontWeight.Bold.weight -> context.getString(R.string.font_weight_bold)
-                    else -> context.getString(R.string.font_weight, it.toInt().toString())
-                }
-            },
-            valueRange = 1f..9f,
-            steps = 8,
-        ) {
-            Text(fontWeightLabel)
-        }
-
-        var vFontSize by remember { fontSize }
-        var fontSizeLabel by remember {
-            mutableStateOf(context.getString(R.string.font_size, vFontSize.toString()))
-        }
-        LabelSlider(
-            modifier = Modifier.fillMaxWidth(),
-            value = vFontSize.toFloat(),
-            onValueChange = {
-                vFontSize = it.toInt()
-                fontSizeLabel = context.getString(R.string.font_size, it.toInt().toString())
-            },
-            valueRange = 10f..40f,
-            steps = 30,
-        ) {
-            Text(fontSizeLabel)
-        }
-
-        var vLineHeight by remember { lineHeight }
-        var lineHeightLabel by remember {
-            mutableStateOf(
-                context.getString(R.string.line_height, String.format("%.2f", vLineHeight))
-            )
-        }
-        LabelSlider(
-            modifier = Modifier.fillMaxWidth(),
-            value = vLineHeight,
-            onValueChange = {
-                vLineHeight = it
-                lineHeightLabel =
-                    context.getString(R.string.line_height, String.format("%.2f", it))
-            },
-            valueRange = 0.8f..2.0f,
-            steps = 120,
-        ) {
-            Text(lineHeightLabel)
+            HorizontalPager(pagerState, userScrollEnabled = false) {
+                val src = remember { sourceList[it] }
+                src.sourceEntity.SearchScreen(src = src, text = inputText, state = sourceState)
+            }
         }
     }
 }

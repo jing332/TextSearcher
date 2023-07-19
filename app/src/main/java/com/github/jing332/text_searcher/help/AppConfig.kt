@@ -85,7 +85,7 @@ object AppConfig {
 
     fun fillDefaultValues(context: Context) {
         if (systemPrompt.value.isEmpty())
-            systemPrompt.value = context.getString(R.string.system_prompt)
+            systemPrompt.value = context.getString(R.string.gpt_system_prompt)
 
         if (msgTemplate.value.isEmpty())
             msgTemplate.value = context.getString(R.string.message_template)

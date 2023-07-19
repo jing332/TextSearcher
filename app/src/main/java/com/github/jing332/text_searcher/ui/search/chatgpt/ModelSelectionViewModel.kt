@@ -1,4 +1,4 @@
-package com.github.jing332.text_searcher.ui.chatgpt
+package com.github.jing332.text_searcher.ui.search.chatgpt
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.getValue

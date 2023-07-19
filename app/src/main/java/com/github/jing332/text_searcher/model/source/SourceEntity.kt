@@ -5,6 +5,7 @@ import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import com.github.jing332.text_searcher.app
 import com.github.jing332.text_searcher.data.entites.SearchSource
+import com.github.jing332.text_searcher.ui.search.SearchSourceState
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -25,5 +26,9 @@ sealed class SourceEntity(
 
     @Composable
     open fun EditScreen(src: SearchSource, onChanged: (SearchSource) -> Unit) {
+    }
+
+    @Composable
+    open fun SearchScreen(src: SearchSource, text: String, state: SearchSourceState) {
     }
 }

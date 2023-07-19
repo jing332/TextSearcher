@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,6 +32,7 @@ fun ExpandableText(
     modifier: Modifier = Modifier,
     textModifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
+    fontFamily: FontFamily = FontFamily.Default,
     fontStyle: FontStyle? = null,
     fontSize: TextUnit = LocalTextStyle.current.fontSize,
     fontWeight: FontWeight = LocalTextStyle.current.fontWeight ?: FontWeight.Normal,
@@ -84,6 +86,7 @@ fun ExpandableText(
             fontSize = fontSize,
             fontWeight = fontWeight,
             lineHeight = lineHeight,
+            fontFamily = fontFamily
         )
     }
 

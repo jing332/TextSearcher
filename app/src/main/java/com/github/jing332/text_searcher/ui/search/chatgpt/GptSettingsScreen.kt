@@ -1,4 +1,4 @@
-package com.github.jing332.text_searcher.ui.chatgpt
+package com.github.jing332.text_searcher.ui.search.chatgpt
 
 import android.content.Context
 import android.content.Intent
@@ -45,15 +45,6 @@ import androidx.compose.ui.unit.dp
 import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.help.AppConfig
 import com.github.jing332.text_searcher.ui.SharedReceiverActivity
-
-private fun doTest(context: Context, text: String) {
-    context.startActivity(Intent(context, SharedReceiverActivity::class.java).apply {
-        action = Intent.ACTION_SEND
-        type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, text)
-    })
-}
-
 
 @Composable
 fun ChatGPTSettingsScreen(
@@ -157,43 +148,5 @@ fun ChatGPTSettingsScreen(
             isError = msgTemplateError,
             supportingText = { if (msgTemplateError) Text(stringResource(R.string.message_template_error_msg)) }
         )
-
-        Divider(
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        )
-
-        var testText by remember { AppConfig.testText }
-        var isVisibleTintText by remember { mutableStateOf(false) }
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 2.dp)
-                .onFocusChanged { isVisibleTintText = it.hasFocus },
-            value = testText,
-            onValueChange = { testText = it },
-            label = { Text(stringResource(id = R.string.test)) },
-            leadingIcon = { Icon(Icons.Filled.BugReport, contentDescription = null) },
-            trailingIcon = {
-                IconButton(onClick = { doTest(context, testText) }
-                ) {
-                    Icon(
-                        Icons.Filled.TextFields,
-                        contentDescription = stringResource(R.string.test),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            },
-            supportingText = {
-                if (isVisibleTintText) Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.test_button_hint),
-                    style = MaterialTheme.typography.labelLarge,
-                    textAlign = TextAlign.Center
-                )
-            }
-        )
-
     }
 }

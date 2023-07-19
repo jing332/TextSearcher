@@ -1,4 +1,4 @@
-package com.github.jing332.text_searcher.ui.chatgpt
+package com.github.jing332.text_searcher.ui.search.chatgpt
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource

@@ -3,7 +3,7 @@
 
     <string name="qrcode">二维码</string>
     <string name="text_searcher_label">ChatGPT·文本搜索</string>
-    <string name="system_prompt">根据用户输入来输出其意义或字面意思</string>
+    <string name="gpt_system_prompt">根据用户输入来输出其意义或字面意思</string>
     <string name="message_template">$text</string>
     <string name="more_options">更多选项</string>
     <string name="test_text_sample">窈窕淑女，君子好逑</string>
@@ -35,4 +35,11 @@
     <string name="add_search_source">添加搜索源</string>
     <string name="back">返回</string>
     <string name="name">名称</string>
+    <string name="type">类型</string>
+    <string name="cancel">取消</string>
+    <string name="confirm_delete">确认删除</string>
+    <string name="delete">删除</string>
+    <string name="font">字体</string>
+    <string name="choose_font">选择字体</string>
+    <string name="system_default_font">系统默认字体</string>
 </resources>

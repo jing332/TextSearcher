@@ -61,7 +61,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import com.github.jing332.text_searcher.BuildConfig
 import com.github.jing332.text_searcher.R
-import com.github.jing332.text_searcher.ui.home.SourceManagerScreen
+import com.github.jing332.text_searcher.ui.manager.SourceManagerScreen
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import java.text.SimpleDateFormat
