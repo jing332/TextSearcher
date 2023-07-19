@@ -1,3 +1,9 @@
+[![Release](https://github.com/jing332/TextSearcher/actions/workflows/release.yaml/badge.svg)](https://github.com/jing332/TextSearcher/actions/workflows/release.yaml)
+[![Test](https://github.com/jing332/TextSearcher/actions/workflows/test.yaml/badge.svg)](https://github.com/jing332/TextSearcher/actions/workflows/test.yaml)
+
+![GitHub release](https://img.shields.io/github/downloads/jing332/TextSearcher/total)
+![GitHub release (latest by date)](https://img.shields.io/github/downloads/jing332/TextSearcher/latest/total)
+
 # TextSearcher
 一个基于ChatGPT的划词搜索Android应用程序
 
