@@ -9,7 +9,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.github.jing332.text_searcher.ui.theme.TxtSearcher
+import com.github.jing332.text_searcher.ui.search.SearcherDialog
+import com.github.jing332.text_searcher.ui.theme.TxtSearcherTheme
 import com.github.jing332.text_searcher.ui.widgets.TransparentSystemBars
 
 class SharedReceiverActivity : ComponentActivity() {
@@ -39,7 +40,7 @@ class SharedReceiverActivity : ComponentActivity() {
             }
         }
         setContent {
-            TxtSearcher {
+            TxtSearcherTheme {
                 TransparentSystemBars()
                 var isVisible by remember { mutableStateOf(true) }
 

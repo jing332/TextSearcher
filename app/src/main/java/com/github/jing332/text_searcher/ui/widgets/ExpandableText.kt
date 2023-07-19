@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.TextUnit
 import com.github.jing332.text_searcher.R
 
 
@@ -31,13 +32,16 @@ fun ExpandableText(
     textModifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
     fontStyle: FontStyle? = null,
+    fontSize: TextUnit = LocalTextStyle.current.fontSize,
+    fontWeight: FontWeight = LocalTextStyle.current.fontWeight ?: FontWeight.Normal,
+    lineHeight: TextUnit = LocalTextStyle.current.lineHeight,
     text: String,
     collapsedMaxLine: Int = 2,
     showMoreText: String = stringResource(R.string.expandble_text_more),
-    showMoreStyle: SpanStyle = SpanStyle(fontWeight = FontWeight.Bold),
+    showMoreStyle: SpanStyle = SpanStyle(fontWeight = FontWeight.ExtraBold),
     showLessText: String = stringResource(R.string.expandble_text_less),
     showLessStyle: SpanStyle = showMoreStyle,
-    textAlign: TextAlign? = null
+    textAlign: TextAlign? = null,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     var clickable by remember { mutableStateOf(false) }
@@ -76,7 +80,10 @@ fun ExpandableText(
                 }
             },
             style = style,
-            textAlign = textAlign
+            textAlign = textAlign,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            lineHeight = lineHeight,
         )
     }
 

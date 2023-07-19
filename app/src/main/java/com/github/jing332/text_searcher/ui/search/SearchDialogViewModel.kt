@@ -1,4 +1,4 @@
-package com.github.jing332.text_searcher.ui
+package com.github.jing332.text_searcher.ui.search
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

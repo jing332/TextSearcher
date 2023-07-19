@@ -6,7 +6,7 @@
     <string name="system_prompt">根据用户输入来输出其意义或字面意思</string>
     <string name="message_template">$text</string>
     <string name="more_options">更多选项</string>
-    <string name="test_text">窈窕淑女，君子好逑</string>
+    <string name="test_text_sample">窈窕淑女，君子好逑</string>
     <string name="test">测试</string>
     <string name="system_prompt_label">系统(System)提示词</string>
     <string name="openai_api_key">OpenAI 密钥</string>
@@ -23,4 +23,16 @@
     <string name="line_height">行间隔：%s</string>
     <string name="expandble_text_more">" 展开"</string>
     <string name="expandble_text_less">" 收起"</string>
+    <string name="font_weight">字体粗细：%s</string>
+    <string name="font_weight_bold">粗体</string>
+    <string name="font_weight_normal">正常</string>
+    <string name="select_font_directory">选择字体目录</string>
+    <string name="font_directory">字体目录</string>
+    <string name="edit_search_source">编辑搜索源</string>
+    <string name="copied_to_clipboard">已复制到剪贴板</string>
+    <string name="about">关于</string>
+    <string name="search_source_manager">搜索源管理</string>
+    <string name="add_search_source">添加搜索源</string>
+    <string name="back">返回</string>
+    <string name="name">名称</string>
 </resources>

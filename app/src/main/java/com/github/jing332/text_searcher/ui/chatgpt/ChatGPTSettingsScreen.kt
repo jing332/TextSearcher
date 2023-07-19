@@ -41,7 +41,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.help.AppConfig
@@ -57,7 +56,13 @@ private fun doTest(context: Context, text: String) {
 
 
 @Composable
-fun ChatGPTSettingsScreen() {
+fun ChatGPTSettingsScreen(
+    modifier: Modifier,
+    key: String, onKeyChange: (String) -> Unit,
+    model: String, onModelChange: (String) -> Unit,
+    systemPrompt: String, onSystemPromptChange: (String) -> Unit,
+    messageTemplate: String, onMessageTemplateChange: (String) -> Unit,
+) {
     var showModelSelectionDialog by remember { mutableStateOf(false) }
     if (showModelSelectionDialog)
         ModelSelectionDialog(
@@ -72,19 +77,18 @@ fun ChatGPTSettingsScreen() {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
             .verticalScroll(scrollState)
     ) {
-        var openAiApiKey by remember { AppConfig.openAiApiKey }
         var passwordVisible by rememberSaveable { mutableStateOf(false) }
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 2.dp),
-            value = openAiApiKey,
-            onValueChange = { openAiApiKey = it },
+            value = key,
+            onValueChange = onKeyChange,
             label = { Text(stringResource(R.string.openai_api_key)) },
             leadingIcon = { Icon(Icons.Filled.Api, contentDescription = null) },
             trailingIcon = {
@@ -100,7 +104,6 @@ fun ChatGPTSettingsScreen() {
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         )
 
-        var openAiModel by remember { AppConfig.openAiModel }
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -109,8 +112,8 @@ fun ChatGPTSettingsScreen() {
                     interactionSource = remember { MutableInteractionSource() },
                     indication = rememberRipple(bounded = true)
                 ) { showModelSelectionDialog = true },
-            value = openAiModel,
-            onValueChange = { openAiModel = it },
+            value = model,
+            onValueChange = onModelChange,
             label = { Text(stringResource(R.string.openai_model)) },
             leadingIcon = { Icon(Icons.Filled.ViewAgenda, contentDescription = null) },
             readOnly = true,
@@ -129,30 +132,25 @@ fun ChatGPTSettingsScreen() {
                 .padding(vertical = 4.dp)
         )
 
-        var systemPrompt by remember { AppConfig.systemPrompt }
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 2.dp),
             value = systemPrompt,
-            onValueChange = { systemPrompt = it },
+            onValueChange = onSystemPromptChange,
             label = { Text(stringResource(R.string.system_prompt_label)) },
             leadingIcon = { Icon(Icons.Filled.Info, contentDescription = null) }
         )
 
-        var msgTemplate by remember { AppConfig.msgTemplate }
         var msgTemplateError by remember { mutableStateOf(false) }
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 2.dp),
-            value = msgTemplate,
+            value = messageTemplate,
             onValueChange = {
-                if (it.contains("\$text")) {
-                    msgTemplateError = false
-                    msgTemplate = it
-                } else
-                    msgTemplateError = true
+                msgTemplateError = !it.contains("\$text")
+                onMessageTemplateChange(it)
             },
             label = { Text(stringResource(R.string.message_template_label)) },
             leadingIcon = { Icon(Icons.Filled.Message, contentDescription = null) },
@@ -198,10 +196,4 @@ fun ChatGPTSettingsScreen() {
         )
 
     }
-}
-
-@Preview
-@Composable
-fun PreviewChatGptSettingsScreen() {
-    ChatGPTSettingsScreen()
 }

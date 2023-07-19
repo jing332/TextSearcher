@@ -1,4 +1,4 @@
-package com.github.jing332.text_searcher.ui
+package com.github.jing332.text_searcher.ui.search
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.animateContentSize
@@ -26,24 +26,19 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.minimumInteractiveComponentSize
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,13 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -144,20 +133,6 @@ fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
                         )
                     }
                 }
-
-                /* Box(modifier = Modifier.align(Alignment.End)) {
-                     Row {
-                         IconButton(onClick = {
-                             isRequestState.value = true
-                         }) {
-                             Icon(Icons.Filled.Refresh, contentDescription = "Refresh")
-                         }
-                         Spacer(modifier = Modifier.width(12.dp))
-                         IconButton(onClick = { onDismissRequest() }) {
-                             Icon(Icons.Filled.Close, contentDescription = "Close")
-                         }
-                     }
-                 }*/
             }
         }
     }
@@ -214,11 +189,20 @@ private fun ChatGPTScreen(
         }
         if (gptAppearanceScreenVisible) ChatGPTAppearanceSettingsScreen(Modifier.animateContentSize())
 
-        ExpandableText(text = inputText, style = MaterialTheme.typography.titleMedium)
+        val titleFontSize by remember { AppConfig.gptTitleFontSize }
+        val titleFontWeight by remember { AppConfig.gptTitleFontWeight }
+        val titleLineHeight by remember { AppConfig.gptTitleLineHeight }
+        ExpandableText(
+            text = inputText, style = MaterialTheme.typography.titleMedium,
+            fontSize = titleFontSize.sp,
+            lineHeight = titleFontSize.sp * titleLineHeight,
+            fontWeight = FontWeight(titleFontWeight)
+        )
 
         Spacer(modifier = Modifier.height(2.dp))
 
         val fontSize by remember { AppConfig.gptFontSize }
+        val fontWeight by remember { AppConfig.gptFontWeight }
         val lineHeight by remember { AppConfig.gptLineHeightScale }
 
         SelectionContainer {
@@ -226,6 +210,7 @@ private fun ChatGPTScreen(
                 text = vm.result,
                 style = MaterialTheme.typography.bodyMedium,
                 fontSize = fontSize.sp,
+                fontWeight = FontWeight(fontWeight),
                 lineHeight = fontSize.sp * lineHeight,
             )
         }
@@ -233,35 +218,117 @@ private fun ChatGPTScreen(
     }
 }
 
-@Composable
-fun ChatGPTAppearanceSettingsDialog(onDismissRequest: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = { Text(text = "ChatGPT外观设置") },
-        text = {
-
-        },
-        confirmButton = {
-            Button(onClick = { onDismissRequest() }) {
-                Text(text = "确定")
-            }
-        },
-    )
-}
-
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatGPTAppearanceSettingsScreen(modifier: Modifier = Modifier) {
     OutlinedCard(modifier) {
-        val context = LocalContext.current
-        var fontSize by remember { AppConfig.gptFontSize }
-        var fontSizeLabel by remember {
-            mutableStateOf(context.getString(R.string.font_size, fontSize.toString()))
+        val scope = rememberCoroutineScope()
+        val pages = remember { listOf("标题", "内容") }
+        val pagerState = rememberPagerState() { pages.size }
+        TabRow(selectedTabIndex = pagerState.currentPage, indicator = { tabPositions ->
+            TabIndicator(
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
+            )
+        }) {
+            pages.forEachIndexed { index, title ->
+                Tab(
+                    text = { Text(title) },
+                    selected = index == pagerState.currentPage,
+                    onClick = {
+                        scope.launch { pagerState.scrollToPage(index) }
+                    },
+                )
+            }
+        }
+        HorizontalPager(pagerState, userScrollEnabled = false) {
+            when (it) {
+                0 -> {
+                    TextStyleSettingsScreen(
+                        fontSize = AppConfig.gptTitleFontSize,
+                        lineHeight = AppConfig.gptTitleLineHeight,
+                        fontWeight = AppConfig.gptTitleFontWeight,
+                    )
+                }
+
+                1 -> {
+                    TextStyleSettingsScreen(
+                        fontSize = AppConfig.gptFontSize,
+                        lineHeight = AppConfig.gptLineHeightScale,
+                        fontWeight = AppConfig.gptFontWeight,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TextStyleSettingsScreen(
+    fontSize: MutableState<Int>,
+    fontWeight: MutableState<Int>,
+    lineHeight: MutableState<Float>
+) {
+    val context = LocalContext.current
+    var showFontSelectionDialog by remember { mutableStateOf(false) }
+    if (showFontSelectionDialog)
+        FontSelectionDialog { showFontSelectionDialog = false }
+
+    Column {
+        OutlinedTextField(
+            value = "", onValueChange = {},
+            readOnly = true,
+            enabled = false,
+            colors = TextFieldDefaults.colors(
+                disabledContainerColor = MaterialTheme.colorScheme.surface,
+                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                disabledLabelColor = MaterialTheme.colorScheme.onSurface,
+                disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 2.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = rememberRipple(bounded = true)
+                ) { showFontSelectionDialog = true },
+        )
+
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        var vFontWeight by remember { fontWeight }
+        var fontWeightLabel by remember {
+            mutableStateOf(
+                context.getString(R.string.font_weight, (vFontWeight / 100).toString())
+            )
         }
         LabelSlider(
             modifier = Modifier.fillMaxWidth(),
-            value = fontSize.toFloat(),
+            value = (vFontWeight / 100).toFloat(),
             onValueChange = {
-                fontSize = it.toInt()
+                vFontWeight = (it.toInt() * 100)
+                fontWeightLabel = when (vFontWeight) {
+                    FontWeight.Normal.weight -> context.getString(R.string.font_weight_normal)
+                    FontWeight.Bold.weight -> context.getString(R.string.font_weight_bold)
+                    else -> context.getString(R.string.font_weight, it.toInt().toString())
+                }
+            },
+            valueRange = 1f..9f,
+            steps = 8,
+        ) {
+            Text(fontWeightLabel)
+        }
+
+        var vFontSize by remember { fontSize }
+        var fontSizeLabel by remember {
+            mutableStateOf(context.getString(R.string.font_size, vFontSize.toString()))
+        }
+        LabelSlider(
+            modifier = Modifier.fillMaxWidth(),
+            value = vFontSize.toFloat(),
+            onValueChange = {
+                vFontSize = it.toInt()
                 fontSizeLabel = context.getString(R.string.font_size, it.toInt().toString())
             },
             valueRange = 10f..40f,
@@ -270,18 +337,19 @@ fun ChatGPTAppearanceSettingsScreen(modifier: Modifier = Modifier) {
             Text(fontSizeLabel)
         }
 
-        var lineHeight by remember { AppConfig.gptLineHeightScale }
+        var vLineHeight by remember { lineHeight }
         var lineHeightLabel by remember {
             mutableStateOf(
-                context.getString(R.string.line_height, String.format("%.2f", lineHeight))
+                context.getString(R.string.line_height, String.format("%.2f", vLineHeight))
             )
         }
         LabelSlider(
             modifier = Modifier.fillMaxWidth(),
-            value = lineHeight,
+            value = vLineHeight,
             onValueChange = {
-                lineHeight = it
-                lineHeightLabel = context.getString(R.string.line_height, String.format("%.2f", it))
+                vLineHeight = it
+                lineHeightLabel =
+                    context.getString(R.string.line_height, String.format("%.2f", it))
             },
             valueRange = 0.8f..2.0f,
             steps = 120,
@@ -296,9 +364,9 @@ fun ChatGPTAppearanceSettingsScreen(modifier: Modifier = Modifier) {
 @Composable
 fun PreviewChatGPTSettingsDialog() {
     var show by remember { mutableStateOf(true) }
-    if (show) {
-        ChatGPTAppearanceSettingsDialog(onDismissRequest = { show = false })
-    }
+//    if (show) {
+//        ChatGPTAppearanceSettingsDialog(onDismissRequest = { show = false })
+//    }
 }
 
 @SuppressLint("SetJavaScriptEnabled")

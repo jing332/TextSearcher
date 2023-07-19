@@ -35,10 +35,40 @@ object AppConfig {
         initialValue = ""
     )
 
+    var fontDir = mutableDataSaverStateOf(
+        dataSaverInterface = dataSaverPref,
+        key = ConfigConst.KEY_FONT_DIR,
+        initialValue = ""
+    )
+
+    var gptTitleFontSize = mutableDataSaverStateOf(
+        dataSaverInterface = dataSaverPref,
+        key = ConfigConst.KEY_GPT_TITLE_FONT_SIZE,
+        initialValue = ConfigConst.VALUE_GPT_TITLE_FONT_SIZE
+    )
+
+    var gptTitleFontWeight = mutableDataSaverStateOf(
+        dataSaverInterface = dataSaverPref,
+        key = ConfigConst.KEY_GPT_TITLE_FONT_WEIGHT,
+        initialValue = ConfigConst.VALUE_GPT_TITLE_FONT_WEIGHT
+    )
+
+    var gptTitleLineHeight = mutableDataSaverStateOf(
+        dataSaverInterface = dataSaverPref,
+        key = ConfigConst.KEY_GPT_TITLE_LINE_HEIGHT,
+        initialValue = ConfigConst.VALUE_GPT_TITLE_LINE_HEIGHT
+    )
+
     var gptFontSize = mutableDataSaverStateOf(
         dataSaverInterface = dataSaverPref,
         key = ConfigConst.KEY_GPT_FONT_SIZE,
         initialValue = ConfigConst.VALUE_GPT_FONT_SIZE
+    )
+
+    var gptFontWeight = mutableDataSaverStateOf(
+        dataSaverInterface = dataSaverPref,
+        key = ConfigConst.KEY_GPT_FONT_WEIGHT,
+        initialValue = ConfigConst.VALUE_GPT_FONT_WEIGHT
     )
 
     var gptLineHeightScale = mutableDataSaverStateOf(
@@ -61,7 +91,7 @@ object AppConfig {
             msgTemplate.value = context.getString(R.string.message_template)
 
         if (testText.value.isEmpty())
-            testText.value = context.getString(R.string.test_text)
+            testText.value = context.getString(R.string.test_text_sample)
 
         if (openAiModel.value.isEmpty())
             openAiModel.value = ConfigConst.VALUE_OPEN_AI_MODEL

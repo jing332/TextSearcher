@@ -1,33 +1,27 @@
 package com.github.jing332.text_searcher.ui
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.view.WindowCompat
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.funny.data_saver.core.LocalDataSaver
-import com.github.jing332.text_searcher.R
+import com.github.jing332.text_searcher.data.appDb
+import com.github.jing332.text_searcher.data.entites.SearchSource
 import com.github.jing332.text_searcher.help.AppConfig
-import com.github.jing332.text_searcher.ui.chatgpt.ChatGPTSettingsScreen
-import com.github.jing332.text_searcher.ui.theme.TxtSearcher
+import com.github.jing332.text_searcher.ui.theme.TxtSearcherTheme
 import com.github.jing332.text_searcher.ui.widgets.TransparentSystemBars
 
 class MainActivity : ComponentActivity() {
@@ -42,35 +36,51 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(
                 LocalDataSaver provides AppConfig.dataSaverPref,
             ) {
-                TxtSearcher {
+                TxtSearcherTheme {
                     TransparentSystemBars()
-                    Scaffold(
-                        modifier = Modifier.imePadding(),
-                        topBar = {
-                            TopAppBar(
-                                title = { Text(stringResource(id = R.string.app_name)) },
-                                actions = {
-                                    IconButton({}) {
-                                        Icon(
-                                            Icons.Filled.MoreVert,
-                                            contentDescription = stringResource(R.string.more_options),
-                                            modifier = Modifier.padding(8.dp)
-                                        )
-                                    }
-                                }
-                            )
-                        }
+                    AppNavigation()
+                }
+            }
+        }
+    }
 
-                    ) {
-                        Surface(
-                            modifier = Modifier
-                                .padding(it)
-                                .fillMaxSize(),
-                            color = MaterialTheme.colorScheme.background
-                        ) {
-                            ChatGPTSettingsScreen()
-                        }
+    @Composable
+    fun AppNavigation(
+        navController: NavHostController = rememberNavController(),
+        drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
+    ) {
+        val snackbarHostState = remember { SnackbarHostState() }
+        val scope = rememberCoroutineScope()
+        CompositionLocalProvider(
+            LocalDataSaver provides AppConfig.dataSaverPref,
+            LocalNavController provides navController,
+            LocalSnackbarHostState provides snackbarHostState
+        ) {
+            NavHost(
+                navController,
+                startDestination = AppNavRoutes.SourceManager.route
+            ) {
+                composable(AppNavRoutes.SourceManager.route) {
+                    MainScreen { finish() }
+                }
+
+                composable(AppNavRoutes.SourceEdit.route) {
+                    @Suppress("DEPRECATION")
+                    val src: SearchSource? =
+                        it.arguments?.getParcelable(AppNavRoutes.SourceEdit.KEY_SOURCE)
+                    if (src == null) {
+                        navController.popBackStack()
+                        return@composable
+                    } else {
+                        src.sourceEntity.EditScreen(src = src, onChanged = { changedSrc ->
+                            appDb.searchSource.insert(changedSrc)
+                            navController.popBackStack()
+                        })
                     }
+                }
+
+                composable(AppNavRoutes.About.route) {
+                    AboutScreen(drawerState)
                 }
             }
         }
