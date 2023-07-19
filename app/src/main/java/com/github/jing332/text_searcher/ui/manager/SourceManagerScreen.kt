@@ -207,7 +207,11 @@ private fun Item(
                                 color = MaterialTheme.colorScheme.error
                             )
                         }, leadingIcon = {
-                            Icon(Icons.Default.DeleteOutline, null)
+                            Icon(
+                                Icons.Default.DeleteOutline,
+                                null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
                         }, children = {
                             androidx.compose.material3.DropdownMenuItem(
                                 text = {

@@ -55,21 +55,20 @@ fun GptSearchScreen(
 ) {
     val entity = src.sourceEntity as ChatGptSourceEntity
 
-    var updateScreen by remember { mutableStateOf(true) }
-    if (updateScreen)
         ChatGPTScreen(
-            key = entity.apiKey,
             state = state,
-            text = text,
+            message = entity.messageTemplate.replace("\$text", text),
+            token = entity.apiKey,
+            model = entity.model,
+            systemPrompt = entity.systemPrompt,
+
             titleAppearance = entity.titleAppearance,
             contentAppearance = entity.contentAppearance,
             onTitleAppearanceChange = {
                 onEntityChange(entity.copy(titleAppearance = it))
-                updateScreen = true
             },
             onContentAppearanceChange = {
                 onEntityChange(entity.copy(contentAppearance = it))
-                updateScreen = true
             }
         )
 }
@@ -77,14 +76,16 @@ fun GptSearchScreen(
 @Composable
 private fun ChatGPTScreen(
     modifier: Modifier = Modifier,
-    key: String,
     state: SearchSourceState,
-    text: String,
+    token: String,
+    model: String,
+    systemPrompt: String,
+    message: String,
     titleAppearance: ChatGptAppearance,
     contentAppearance: ChatGptAppearance,
     onTitleAppearanceChange: (ChatGptAppearance) -> Unit,
     onContentAppearanceChange: (ChatGptAppearance) -> Unit,
-    vm: GptSearchScreenViewModel = viewModel(key = key)
+    vm: GptSearchScreenViewModel = viewModel(key = token)
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -97,10 +98,10 @@ private fun ChatGPTScreen(
             AppConfig.fillDefaultValues(context)
             vm.requestChatGPT(
                 context,
-                msg = text,
-                token = AppConfig.openAiApiKey.value,
-                model = AppConfig.openAiModel.value,
-                systemPrompt = AppConfig.systemPrompt.value,
+                msg = message,
+                token = token,
+                model = model,
+                systemPrompt = systemPrompt,
             )
         }
     }
@@ -162,7 +163,7 @@ private fun ChatGPTScreen(
             return FontFamily.Default
         }
         ExpandableText(
-            text = text, style = MaterialTheme.typography.titleMedium,
+            text = message, style = MaterialTheme.typography.titleMedium,
             fontFamily = fontFamily(mTitleAppearance.fontUri),
             fontSize = mTitleAppearance.fontSize.sp,
             lineHeight = mTitleAppearance.fontSize.sp * mTitleAppearance.lineWidthScale,

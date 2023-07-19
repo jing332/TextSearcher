@@ -24,24 +24,25 @@ class FontSelectionViewModel : ViewModel() {
                 FontFamily.Default
             )
         )
-        val files = DocumentFile.fromTreeUri(context, fontDir.toUri())
-        files?.let {
-            it.listFiles().forEachIndexed { index, documentFile ->
-                context.contentResolver.openFileDescriptor(documentFile.uri, "r")?.use { pfd ->
-                    runCatching {
-                        val ff = FontFamily(Font(pfd))
-                        ffResolver.resolve(ff)
+        kotlin.runCatching {
+            val files = DocumentFile.fromTreeUri(context, fontDir.toUri())
+            files?.let {
+                it.listFiles().forEachIndexed { index, documentFile ->
+                    context.contentResolver.openFileDescriptor(documentFile.uri, "r")?.use { pfd ->
+                        runCatching {
+                            val ff = FontFamily(Font(pfd))
+                            ffResolver.resolve(ff)
 
-                        fontList.add(
-                            FontItem(
-                                uri = documentFile.uri,
-                                key = documentFile.uri.toString() + index,
-                                name = documentFile.name ?: "",
-                                fontFamily = ff
+                            fontList.add(
+                                FontItem(
+                                    uri = documentFile.uri,
+                                    key = documentFile.uri.toString() + index,
+                                    name = documentFile.name ?: "",
+                                    fontFamily = ff
+                                )
                             )
-                        )
+                        }
                     }
-
                 }
             }
         }

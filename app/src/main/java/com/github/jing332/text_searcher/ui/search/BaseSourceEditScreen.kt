@@ -16,6 +16,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -32,6 +34,7 @@ import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.data.entites.SearchSource
 import com.github.jing332.text_searcher.help.AppConfig
 import com.github.jing332.text_searcher.ui.LocalNavController
+import com.github.jing332.text_searcher.ui.LocalSnackbarHostState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +70,8 @@ fun BaseSourceEditScreen(
                     }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(LocalSnackbarHostState.current) }
     ) { padValues ->
         Column(Modifier.padding(padValues)) {
             Column(

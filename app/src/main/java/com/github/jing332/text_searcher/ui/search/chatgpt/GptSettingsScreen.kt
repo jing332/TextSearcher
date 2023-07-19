@@ -1,7 +1,5 @@
 package com.github.jing332.text_searcher.ui.search.chatgpt
 
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -12,10 +10,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Api
-import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Message
-import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -34,17 +30,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.help.AppConfig
-import com.github.jing332.text_searcher.ui.SharedReceiverActivity
 
 @Composable
 fun ChatGPTSettingsScreen(
@@ -77,7 +71,10 @@ fun ChatGPTSettingsScreen(
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 2.dp),
+                .padding(vertical = 2.dp).run {
+                    if (key.isBlank()) this
+                    else this.focusRequester(remember { androidx.compose.ui.focus.FocusRequester() })
+                },
             value = key,
             onValueChange = onKeyChange,
             label = { Text(stringResource(R.string.openai_api_key)) },
@@ -93,6 +90,7 @@ fun ChatGPTSettingsScreen(
             },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            isError = key.isBlank(),
         )
 
         OutlinedTextField(

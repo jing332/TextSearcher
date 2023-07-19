@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,7 +41,7 @@ fun ExpandableText(
     text: String,
     collapsedMaxLine: Int = 2,
     showMoreText: String = stringResource(R.string.expandble_text_more),
-    showMoreStyle: SpanStyle = SpanStyle(fontWeight = FontWeight.ExtraBold),
+    showMoreStyle: SpanStyle = SpanStyle(fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary),
     showLessText: String = stringResource(R.string.expandble_text_less),
     showLessStyle: SpanStyle = showMoreStyle,
     textAlign: TextAlign? = null,
