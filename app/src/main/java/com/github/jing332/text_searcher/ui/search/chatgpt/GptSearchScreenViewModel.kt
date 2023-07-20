@@ -11,6 +11,7 @@ import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
 import com.aallam.openai.api.exception.RateLimitException
+import com.aallam.openai.api.logging.LogLevel
 import com.aallam.openai.api.logging.Logger
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.LoggingConfig
@@ -36,7 +37,7 @@ class GptSearchScreenViewModel : ViewModel() {
         val openAI = OpenAI(
             token = token,
             retry = RetryStrategy(1),
-            logging = LoggingConfig(logger = Logger.Empty)
+            logging = LoggingConfig(logger = Logger.Empty, logLevel = LogLevel.None)
             //timeout = Timeout(request = 8.seconds, connect = 8.seconds, socket = 8.seconds),
 //            proxy = ProxyConfig.Http("http://127.0.0.1:10801")
         )

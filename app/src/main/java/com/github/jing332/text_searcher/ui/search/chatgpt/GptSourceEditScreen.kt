@@ -52,8 +52,8 @@ fun GptSourceEditScreen(src: SearchSource, onChanged: (SearchSource) -> Unit) {
                 src = showTestDialog!!.first,
                 text = showTestDialog!!.second,
                 state = state,
-                onEntityChange = {
-                    onChanged(src.copy(sourceEntity = it))
+                onTtsChange = {
+                    onChanged(it)
                 }
             )
         }

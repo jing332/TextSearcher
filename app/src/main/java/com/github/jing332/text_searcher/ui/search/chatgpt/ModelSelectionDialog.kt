@@ -55,6 +55,7 @@ fun PreviewLoadingScreen() {
 
 @Composable
 private fun ModelSelectionScreen(
+    token: String,
     currentModel: String,
     onModelChange: (String) -> Unit,
     vm: ModelSelectionViewModel = viewModel()
@@ -66,7 +67,7 @@ private fun ModelSelectionScreen(
     LaunchedEffect(key1 = vm.hashCode(), block = {
         scope.launch(Dispatchers.IO) {
             try {
-                vm.loadModels(context, AppConfig.openAiApiKey.value, AppConfig.openAiModel.value)
+                vm.loadModels(context, token, currentModel)
                 withMain {
                     val i = vm.models.indexOf(currentModel)
                     if (i >= 0) vm.lazyListState.scrollToItem(i)
@@ -115,7 +116,10 @@ private fun ModelSelectionScreen(
 
 @Composable
 fun ModelSelectionDialog(
-    currentModel: String, onSelectChange: (String) -> Unit, onDismissRequest: () -> Unit
+    token: String,
+    currentModel: String,
+    onSelectChange: (String) -> Unit,
+    onDismissRequest: () -> Unit
 ) {
     AlertDialog(onDismissRequest = onDismissRequest,
         confirmButton = {
@@ -143,7 +147,8 @@ fun ModelSelectionDialog(
                 else {
                     ModelSelectionScreen(
                         currentModel = currentModel,
-                        onModelChange = onSelectChange
+                        onModelChange = onSelectChange,
+                        token = token
                     )
                 }
             }
@@ -157,6 +162,7 @@ fun PreviewModelSelectionDialog() {
     var showDialog by remember { mutableStateOf(true) }
     if (showDialog) {
         ModelSelectionDialog(
+            "api key",
             "gpt-3.5-turbo",
             onDismissRequest = { showDialog = false },
             onSelectChange = {}

@@ -47,7 +47,7 @@ fun BaseSourceEditScreen(
 ) {
     val navController = LocalNavController.current
     var name by remember { mutableStateOf(src.name) }
-    var testText by remember { AppConfig.testText }
+    var testText by remember { mutableStateOf(src.testText) }
     Scaffold(
         topBar = {
             TopAppBar(

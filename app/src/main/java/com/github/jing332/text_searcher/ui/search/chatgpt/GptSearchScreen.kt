@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -42,7 +41,9 @@ import com.github.jing332.text_searcher.data.entites.SearchSource
 import com.github.jing332.text_searcher.help.AppConfig
 import com.github.jing332.text_searcher.model.source.ChatGptAppearance
 import com.github.jing332.text_searcher.model.source.ChatGptSourceEntity
+import com.github.jing332.text_searcher.model.source.ChatGptTTS
 import com.github.jing332.text_searcher.ui.search.SearchSourceState
+import com.github.jing332.text_searcher.ui.search.chatgpt.tts.TtsSettingsDialog
 import com.github.jing332.text_searcher.ui.widgets.ExpandableText
 import kotlinx.coroutines.launch
 
@@ -51,9 +52,13 @@ fun GptSearchScreen(
     src: SearchSource,
     text: String,
     state: SearchSourceState,
-    onEntityChange: (ChatGptSourceEntity) -> Unit,
+    onTtsChange: (SearchSource) -> Unit,
 ) {
     val entity = src.sourceEntity as ChatGptSourceEntity
+
+    fun onEntityChange(en: ChatGptSourceEntity) {
+        onTtsChange(src.copy(sourceEntity = en))
+    }
 
     ChatGPTScreen(
         id = src.id,
@@ -70,8 +75,19 @@ fun GptSearchScreen(
         },
         onContentAppearanceChange = {
             onEntityChange(entity.copy(contentAppearance = it))
-        }
-    )
+        },
+        tts = entity.tts,
+        onTtsChange = {
+            onEntityChange(entity.copy(tts = it))
+        },
+
+        testText = src.testText,
+        onTestTextChange = {
+            onTtsChange(src.copy(testText = it))
+        },
+
+
+        )
 }
 
 @Composable
@@ -87,6 +103,13 @@ private fun ChatGPTScreen(
     contentAppearance: ChatGptAppearance,
     onTitleAppearanceChange: (ChatGptAppearance) -> Unit,
     onContentAppearanceChange: (ChatGptAppearance) -> Unit,
+
+    tts: ChatGptTTS,
+    onTtsChange: (ChatGptTTS) -> Unit,
+
+    testText: String,
+    onTestTextChange: (String) -> Unit,
+
     vm: GptSearchScreenViewModel = viewModel(key = id.toString())
 ) {
     val scope = rememberCoroutineScope()
@@ -116,23 +139,75 @@ private fun ChatGPTScreen(
     var gptAppearanceScreenVisible by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     Column(modifier.verticalScroll(scrollState)) {
-        Row(
-            modifier
-                .wrapContentWidth()
-                .align(Alignment.CenterHorizontally)
-                .clickable(
-                    enabled = true,
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = rememberRipple(bounded = true),
-                    onClick = { gptAppearanceScreenVisible = !gptAppearanceScreenVisible },
+        Row {
+            Column(
+                modifier
+                    .weight(1f)
+                    .clickable(
+                        enabled = true,
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = rememberRipple(bounded = true),
+                        onClick = { gptAppearanceScreenVisible = !gptAppearanceScreenVisible },
+                    )
+            ) {
+                Row(Modifier.align(Alignment.CenterHorizontally)) {
+                    Text(text = stringResource(R.string.appearance_settings))
+                    Icon(
+                        modifier = Modifier.size(20.dp),
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = stringResource(R.string.appearance_settings),
+                    )
+                }
+            }
+
+            var showTtsSettings by remember { mutableStateOf(false) }
+            if (showTtsSettings) {
+                var vTts by remember { mutableStateOf(tts) }
+                var vTestText by remember { mutableStateOf(testText) }
+
+
+                TtsSettingsDialog(
+                    onDismissRequest = { showTtsSettings = false },
+                    tts = vTts,
+                    testText = vTestText,
+                    onTestTextChange = {
+                        vTestText = it
+                        onTestTextChange(it)
+                    },
+                    onTtsChange = {
+                        vTts = it
+                        onTtsChange(it)
+                    }
                 )
-        ) {
-            Text(text = stringResource(R.string.appearance_settings))
-            Icon(
-                modifier = Modifier.size(20.dp),
-                imageVector = Icons.Filled.Settings,
-                contentDescription = stringResource(R.string.appearance_settings),
-            )
+            }
+            /*Divider(
+                Modifier
+                    .fillMaxHeight()
+                    .width(1.dp)
+                    .padding(horizontal = 2.dp)
+            )*/
+            Column(
+                Modifier
+                    .weight(1f)
+                    .clickable(
+                        enabled = true,
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = rememberRipple(bounded = true),
+                        onClick = { showTtsSettings = true },
+                    )
+            ) {
+                Row(
+                    Modifier.align(Alignment.CenterHorizontally)
+
+                ) {
+                    Text(text = stringResource(R.string.tts_settings))
+                    Icon(
+                        modifier = Modifier.size(20.dp),
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = stringResource(R.string.tts_settings),
+                    )
+                }
+            }
         }
 
         // GPT外观设置
@@ -174,7 +249,6 @@ private fun ChatGPTScreen(
 
         Spacer(modifier = Modifier.height(2.dp))
 
-
         SelectionContainer {
             Text(
                 text = vm.result,
@@ -188,3 +262,4 @@ private fun ChatGPTScreen(
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
+

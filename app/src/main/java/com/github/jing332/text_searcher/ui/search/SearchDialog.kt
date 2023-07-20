@@ -1,65 +1,38 @@
 package com.github.jing332.text_searcher.ui.search
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.data.appDb
-import com.github.jing332.text_searcher.help.AppConfig
-import com.github.jing332.text_searcher.ui.widgets.ExpandableText
-import com.github.jing332.text_searcher.ui.widgets.LabelSlider
 import com.google.accompanist.web.AccompanistWebChromeClient
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.WebView
@@ -96,34 +69,42 @@ fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
         val sourceList = rememberSaveable { appDb.searchSource.all }
         val pages = rememberSaveable { sourceList.map { it.name } }
         val scope = rememberCoroutineScope()
-
-        Column {
-            val pagerState = rememberPagerState { pages.size }
-            TabRow(selectedTabIndex = pagerState.currentPage, indicator = { tabPositions ->
-                TabIndicator(
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
-                )
-            }) {
-                pages.forEachIndexed { index, title ->
-                    Tab(
-                        text = { Text(title) },
-                        selected = index == pagerState.currentPage,
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
+        if (pages.isEmpty())
+            Text(
+                stringResource(R.string.please_add_search_source),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.error,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(8.dp)
+            )
+        else
+            Column {
+                val pagerState = rememberPagerState { pages.size }
+                TabRow(selectedTabIndex = pagerState.currentPage, indicator = { tabPositions ->
+                    TabIndicator(
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
                     )
+                }) {
+                    pages.forEachIndexed { index, title ->
+                        Tab(
+                            text = { Text(title) },
+                            selected = index == pagerState.currentPage,
+                            onClick = {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            },
+                        )
+                    }
+                }
+                HorizontalPager(pagerState, userScrollEnabled = false) {
+                    val src = remember { sourceList[it] }
+                    val state = rememberSaveable { SearchSourceState() }
+
+                    src.sourceEntity.SearchScreen(src = src, text = inputText, state = state)
                 }
             }
-            HorizontalPager(pagerState, userScrollEnabled = false) {
-                val src = remember { sourceList[it] }
-                val state = rememberSaveable { SearchSourceState() }
-
-                src.sourceEntity.SearchScreen(src = src, text = inputText, state = state)
-            }
-        }
     }
 }
 
@@ -161,5 +142,8 @@ fun WebViewScreen(modifier: Modifier, url: String) {
 @Composable
 private fun PreviewSearcherDialog() {
     var isShow by remember { mutableStateOf(true) }
-    if (isShow) SearcherDialog(onDismissRequest = { isShow = false }, inputText = "帝国主义")
+    if (isShow) SearcherDialog(
+        onDismissRequest = { isShow = false },
+        inputText = "帝国主义\n军国主义\n111"
+    )
 }

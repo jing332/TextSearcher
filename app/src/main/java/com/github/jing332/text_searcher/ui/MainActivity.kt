@@ -33,14 +33,7 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         AppConfig.fillDefaultValues(this)
 
-        if (appDb.searchSource.count == 0) {
-            appDb.searchSource.insert(
-                SearchSource(
-                    name = getString(R.string.chatgpt_search_source_name),
-                    sourceEntity = ChatGptSourceEntity()
-                )
-            )
-        }
+
 
         setContent {
             CompositionLocalProvider(

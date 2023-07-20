@@ -38,7 +38,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.github.jing332.text_searcher.R
-import com.github.jing332.text_searcher.help.AppConfig
 
 @Composable
 fun ChatGPTSettingsScreen(
@@ -51,10 +50,11 @@ fun ChatGPTSettingsScreen(
     var showModelSelectionDialog by remember { mutableStateOf(false) }
     if (showModelSelectionDialog)
         ModelSelectionDialog(
-            currentModel = AppConfig.openAiModel.value,
+            token = key,
+            currentModel = model,
             onDismissRequest = { showModelSelectionDialog = false },
             onSelectChange = {
-                AppConfig.openAiModel.value = it
+                onModelChange(it)
                 showModelSelectionDialog = false
             },
         )

@@ -57,4 +57,9 @@
     <string name="file_path">文件路径</string>
     <string name="select_file">选择文件</string>
     <string name="error">错误</string>
+    <string name="tts_settings">TTS设置</string>
+    <string name="tts_engine">TTS 引擎</string>
+    <string name="tts_speech_rate">语速：%s</string>
+    <string name="tts_pitch">音高：%s</string>
+    <string name="please_add_search_source">请先添加搜索源</string>
 </resources>
