@@ -62,4 +62,6 @@
     <string name="tts_speech_rate">语速：%s</string>
     <string name="tts_pitch">音高：%s</string>
     <string name="please_add_search_source">请先添加搜索源</string>
+    <string name="locale">地区</string>
+    <string name="voice">语音</string>
 </resources>

@@ -8,7 +8,11 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 data class ChatGptTTS(
+    val isEnabled: Boolean = false,
+
     val engine: String = "",
+    val locale: String = "",
+    val voice: String = "",
 
     @FloatRange(from = 0.1, to = 5.0)
     val speechRate: Float = 1.0f,

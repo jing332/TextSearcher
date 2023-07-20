@@ -3,13 +3,17 @@ package com.github.jing332.text_searcher.help
 
 import android.content.Context
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.time.withTimeout
+import kotlinx.coroutines.withTimeout
 import java.util.Locale
 
 class LocalTtsEngineHelper(val context: Context) {
@@ -76,6 +80,54 @@ class LocalTtsEngineHelper(val context: Context) {
 
         }
         return true
+    }
+
+    suspend fun speak(
+        text: String,
+        locale: Locale? = null,
+        voice: Voice? = null,
+        speechRate: Float,
+        pitch: Float,
+        // 由 speak() 到 onStart() 的超时时间
+        timeout: Long = 5000
+    ) = coroutineScope {
+        var waitJob: Job? = null
+        var isStarted = false
+
+        tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            override fun onDone(utteranceId: String?) {
+                waitJob?.cancel()
+            }
+
+            @Deprecated("Deprecated in Java")
+            override fun onError(utteranceId: String?) {
+            }
+
+            override fun onStart(utteranceId: String?) {
+                isStarted = true
+            }
+        })
+
+        tts?.apply {
+            setSpeechRate(speechRate)
+            setPitch(pitch)
+
+            if (locale != null) language = locale
+            setVoice(voice ?: defaultVoice)
+
+            speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+
+            launch {
+                withTimeout(timeout) {
+                    if (!isStarted) waitJob?.cancel()
+                }
+            }
+
+            waitJob = launch {
+                awaitCancellation()
+            }.job
+            waitJob?.join()
+        }
     }
 
     fun shutdown() {

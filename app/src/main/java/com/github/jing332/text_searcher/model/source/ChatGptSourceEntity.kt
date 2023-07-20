@@ -1,6 +1,10 @@
 package com.github.jing332.text_searcher.model.source
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.app
 import com.github.jing332.text_searcher.data.appDb
@@ -57,7 +61,10 @@ data class ChatGptSourceEntity(
 
     @Composable
     override fun SearchScreen(src: SearchSource, text: String, state: SearchSourceState) {
-        GptSearchScreen(src = src, text = text, state = state, onTtsChange = {
+        var vSrc by remember { mutableStateOf(src) }
+
+        GptSearchScreen(src = vSrc, text = text, state = state, onTtsChange = {
+            vSrc = it
             appDb.searchSource.update(it)
         })
     }

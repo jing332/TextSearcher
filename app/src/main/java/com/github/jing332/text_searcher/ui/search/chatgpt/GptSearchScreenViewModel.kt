@@ -17,15 +17,40 @@ import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.RetryStrategy
+import com.drake.net.utils.withIO
 import com.github.jing332.text_searcher.R
+import com.github.jing332.text_searcher.help.LocalTtsEngineHelper
+import com.github.jing332.text_searcher.model.source.ChatGptTTS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.util.Locale
 import kotlin.coroutines.coroutineContext
 
 class GptSearchScreenViewModel : ViewModel() {
     var result by mutableStateOf("")
     private var isLoading by mutableStateOf(false)
+
+    private var mTtsEngine: LocalTtsEngineHelper? = null
+    fun load(context: Context) {
+        mTtsEngine = mTtsEngine ?: LocalTtsEngineHelper(context)
+    }
+
+    suspend fun speak(text: String, ttsConfig: ChatGptTTS) {
+        mTtsEngine?.apply {
+            setEngine(ttsConfig.engine)
+            val locale =
+                if (ttsConfig.locale.isBlank()) null else Locale.forLanguageTag(ttsConfig.locale)
+            val voice = mTtsEngine?.voices?.find { it.name == ttsConfig.voice }
+            mTtsEngine?.speak(
+                text = text,
+                locale = locale,
+                voice = voice,
+                speechRate = ttsConfig.speechRate,
+                pitch = ttsConfig.pitch
+            )
+        }
+    }
 
     @OptIn(BetaOpenAI::class)
     suspend fun requestInternal(
@@ -64,7 +89,7 @@ class GptSearchScreenViewModel : ViewModel() {
         }
     }
 
-    fun requestChatGPT(
+    suspend fun requestGpt(
         context: Context,
         msg: String,
         token: String,
@@ -75,10 +100,10 @@ class GptSearchScreenViewModel : ViewModel() {
 
         result = ""
         isLoading = true
-        viewModelScope.launch(Dispatchers.IO) {
+        withIO {
             if (token.isBlank()) {
                 result = context.getString(R.string.error_open_ai_api_key_empty)
-                return@launch
+                return@withIO
             }
             try {
                 requestInternal(
@@ -95,4 +120,6 @@ class GptSearchScreenViewModel : ViewModel() {
             }
         }
     }
+
+
 }

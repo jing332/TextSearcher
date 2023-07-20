@@ -35,10 +35,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.data.entites.SearchSource
-import com.github.jing332.text_searcher.help.AppConfig
 import com.github.jing332.text_searcher.model.source.ChatGptAppearance
 import com.github.jing332.text_searcher.model.source.ChatGptSourceEntity
 import com.github.jing332.text_searcher.model.source.ChatGptTTS
@@ -76,6 +76,7 @@ fun GptSearchScreen(
         onContentAppearanceChange = {
             onEntityChange(entity.copy(contentAppearance = it))
         },
+
         tts = entity.tts,
         onTtsChange = {
             onEntityChange(entity.copy(tts = it))
@@ -85,9 +86,7 @@ fun GptSearchScreen(
         onTestTextChange = {
             onTtsChange(src.copy(testText = it))
         },
-
-
-        )
+    )
 }
 
 @Composable
@@ -118,10 +117,15 @@ private fun ChatGPTScreen(
     var mTitleAppearance by remember { mutableStateOf(titleAppearance) }
     var mContentAppearance by remember { mutableStateOf(contentAppearance) }
 
-    fun request() {
-        scope.launch {
-            AppConfig.fillDefaultValues(context)
-            vm.requestChatGPT(
+    fun load() {
+        vm.load(context)
+        if (tts.isEnabled)
+            scope.launch {
+                vm.speak(message, tts)
+            }
+
+        vm.viewModelScope.launch {
+            vm.requestGpt(
                 context,
                 msg = message,
                 token = token,
@@ -132,7 +136,7 @@ private fun ChatGPTScreen(
     }
 
     if (state.requestLoad) {
-        request()
+        load()
         state.requestLoad = false
     }
 
@@ -165,10 +169,10 @@ private fun ChatGPTScreen(
                 var vTts by remember { mutableStateOf(tts) }
                 var vTestText by remember { mutableStateOf(testText) }
 
-
                 TtsSettingsDialog(
                     onDismissRequest = { showTtsSettings = false },
                     tts = vTts,
+                    message = message,
                     testText = vTestText,
                     onTestTextChange = {
                         vTestText = it
