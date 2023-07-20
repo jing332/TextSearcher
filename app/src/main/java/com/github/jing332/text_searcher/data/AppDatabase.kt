@@ -11,7 +11,7 @@ import com.github.jing332.text_searcher.data.entites.SearchSource
 val appDb by lazy { AppDatabase.createDatabase(app) }
 
 @Database(
-    version = 1,
+    version = 2,
     entities = [SearchSource::class],
 )
 abstract class AppDatabase : RoomDatabase() {

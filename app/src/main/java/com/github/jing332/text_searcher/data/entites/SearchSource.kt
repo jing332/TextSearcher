@@ -1,6 +1,7 @@
 package com.github.jing332.text_searcher.data.entites
 
 import android.os.Parcelable
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
@@ -22,6 +23,9 @@ data class SearchSource(
     val id: Long = System.currentTimeMillis(),
     val name: String = "",
     val order: Int = 0,
+
+    @ColumnInfo(defaultValue = "")
+    val testText: String = "",
 
     val sourceEntity: SourceEntity,
 ) : Parcelable {

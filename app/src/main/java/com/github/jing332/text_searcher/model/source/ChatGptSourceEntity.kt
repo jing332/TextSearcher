@@ -20,7 +20,6 @@ data class ChatGptSourceEntity(
     val model: String = VALUE_MODEL,
     val systemPrompt: String = VALUE_SYSTEM_PROMPT,
     val messageTemplate: String = VALUE_MESSAGE_TEMPLATE,
-    val testText: String = "",
 
     val titleAppearance: ChatGptAppearance = ChatGptAppearance(
         fontSize = VALUE_GPT_TITLE_FONT_SIZE,
@@ -31,6 +30,8 @@ data class ChatGptSourceEntity(
         fontSize = VALUE_GPT_FONT_SIZE,
         lineWidthScale = VALUE_GPT_LINE_HEIGHT_SCALE
     ),
+
+    val tts: ChatGptTTS = ChatGptTTS()
 ) : SourceEntity() {
     companion object {
         const val VALUE_MODEL = "gpt-3.5-turbo"
@@ -56,8 +57,8 @@ data class ChatGptSourceEntity(
 
     @Composable
     override fun SearchScreen(src: SearchSource, text: String, state: SearchSourceState) {
-        GptSearchScreen(src = src, text = text, state = state, onEntityChange = {
-            appDb.searchSource.update(src.copy(sourceEntity = it))
+        GptSearchScreen(src = src, text = text, state = state, onTtsChange = {
+            appDb.searchSource.update(it)
         })
     }
 }
