@@ -118,26 +118,6 @@ fun PreviewChatGPTSettingsDialog() {
 //    }
 }
 
-@SuppressLint("SetJavaScriptEnabled")
-@Composable
-fun WebViewScreen(modifier: Modifier, url: String) {
-    val state = rememberWebViewState(
-        url = url
-    )
-    val client = remember {
-        object : AccompanistWebViewClient() {}
-    }
-    val chromeClient = remember {
-        object : AccompanistWebChromeClient() {}
-    }
-    WebView(
-        modifier = modifier, state = state,
-        onCreated = { it.settings.javaScriptEnabled = true },
-        client = client,
-        chromeClient = chromeClient,
-    )
-}
-
 @Preview
 @Composable
 private fun PreviewSearcherDialog() {

@@ -10,8 +10,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -75,7 +78,9 @@ class MainActivity : ComponentActivity() {
                         navController.popBackStack()
                         return@composable
                     } else {
-                        src.sourceEntity.EditScreen(src = src, onChanged = { changedSrc ->
+                        var vSrc by remember{ mutableStateOf(src) }
+                        vSrc.sourceEntity.EditScreen(src = vSrc, onChanged = { changedSrc ->
+                            vSrc = changedSrc
                             appDb.searchSource.insert(changedSrc)
                             navController.popBackStack()
                         })

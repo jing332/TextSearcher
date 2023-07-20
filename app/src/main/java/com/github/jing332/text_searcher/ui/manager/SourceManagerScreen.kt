@@ -46,6 +46,8 @@ import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.data.appDb
 import com.github.jing332.text_searcher.data.entites.SearchSource
 import com.github.jing332.text_searcher.model.source.ChatGptSourceEntity
+import com.github.jing332.text_searcher.model.source.SourceEntity
+import com.github.jing332.text_searcher.model.source.WebSiteSourceEntity
 import com.github.jing332.text_searcher.ui.AppNavRoutes
 import com.github.jing332.text_searcher.ui.LocalNavController
 import com.github.jing332.text_searcher.ui.LocalSnackbarHostState
@@ -107,6 +109,18 @@ fun SourceManagerScreen(drawerState: DrawerState, vm: SourceManagerViewModel = v
                     }
                 },
                 actions = {
+                    fun startEditScreen(entity: SourceEntity) {
+                        navController.navigateSingleTop(
+                            AppNavRoutes.SourceEdit.route,
+                            args = Bundle().apply {
+                                putParcelable(
+                                    AppNavRoutes.SourceEdit.KEY_SOURCE,
+                                    SearchSource(sourceEntity = entity)
+                                )
+                            }
+                        )
+                    }
+
                     var showAddMenu by remember { mutableStateOf(false) }
                     CascadeDropdownMenu(
                         expanded = showAddMenu,
@@ -121,13 +135,16 @@ fun SourceManagerScreen(drawerState: DrawerState, vm: SourceManagerViewModel = v
                                             AppNavRoutes.SourceEdit.KEY_SOURCE,
                                             SearchSource(sourceEntity = ChatGptSourceEntity())
                                         )
-                                    })
+                                    }
+                                )
                             }
                         )
 
                         DropdownMenuItem(
                             text = { Text("搜索引擎") },
-                            onClick = {}
+                            onClick = {
+                                startEditScreen(WebSiteSourceEntity())
+                            }
                         )
                     }
 

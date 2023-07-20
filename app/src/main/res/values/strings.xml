@@ -64,4 +64,5 @@
     <string name="please_add_search_source">请先添加搜索源</string>
     <string name="locale">地区</string>
     <string name="voice">语音</string>
+    <string name="website">网页</string>
 </resources>
