@@ -52,7 +52,7 @@ fun GptSourceEditScreen(src: SearchSource, onChanged: (SearchSource) -> Unit) {
                 src = showTestDialog!!.first,
                 text = showTestDialog!!.second,
                 state = state,
-                onTtsChange = {
+                onSrcChange = {
                     onChanged(it)
                 }
             )

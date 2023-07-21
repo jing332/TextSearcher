@@ -52,12 +52,12 @@ fun GptSearchScreen(
     src: SearchSource,
     text: String,
     state: SearchSourceState,
-    onTtsChange: (SearchSource) -> Unit,
+    onSrcChange: (SearchSource) -> Unit,
 ) {
     val entity = src.sourceEntity as ChatGptSourceEntity
 
     fun onEntityChange(en: ChatGptSourceEntity) {
-        onTtsChange(src.copy(sourceEntity = en))
+        onSrcChange(src.copy(sourceEntity = en))
     }
 
     ChatGPTScreen(
@@ -84,7 +84,7 @@ fun GptSearchScreen(
 
         testText = src.testText,
         onTestTextChange = {
-            onTtsChange(src.copy(testText = it))
+            onSrcChange(src.copy(testText = it))
         },
     )
 }

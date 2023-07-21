@@ -1,6 +1,7 @@
 package com.github.jing332.text_searcher.model.source
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -12,6 +13,7 @@ import com.github.jing332.text_searcher.data.entites.SearchSource
 import com.github.jing332.text_searcher.ui.search.SearchSourceState
 import com.github.jing332.text_searcher.ui.search.chatgpt.GptSearchScreen
 import com.github.jing332.text_searcher.ui.search.chatgpt.GptSourceEditScreen
+import com.github.jing332.text_searcher.utils.ThrottleUtil
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -63,9 +65,12 @@ data class ChatGptSourceEntity(
     override fun SearchScreen(src: SearchSource, text: String, state: SearchSourceState) {
         var vSrc by remember { mutableStateOf(src) }
 
-        GptSearchScreen(src = vSrc, text = text, state = state, onTtsChange = {
-            vSrc = it
-            appDb.searchSource.update(it)
-        })
+        GptSearchScreen(src = vSrc, text = text, state = state, onSrcChange = { vSrc = it })
+
+        DisposableEffect(vSrc.id) {
+            onDispose {
+                appDb.searchSource.update(vSrc)
+            }
+        }
     }
 }

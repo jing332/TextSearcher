@@ -4,7 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
@@ -27,6 +29,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,12 +48,14 @@ import java.util.Locale
 @Composable
 fun TtsSettingsDialog(
     onDismissRequest: () -> Unit,
+
     tts: ChatGptTTS,
+    onTtsChange: (ChatGptTTS) -> Unit,
+
     // testText 为空时使用 message
     message: String,
     testText: String,
     onTestTextChange: (String) -> Unit,
-    onTtsChange: (ChatGptTTS) -> Unit,
 ) {
     BaseSearchDialog(onDismissRequest = onDismissRequest) {
         Column(Modifier.fillMaxWidth()) {
@@ -66,6 +71,7 @@ fun TtsSettingsDialog(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .minimumInteractiveComponentSize()
+                    .clip(MaterialTheme.shapes.small)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = rememberRipple()
@@ -74,12 +80,13 @@ fun TtsSettingsDialog(
                     }
             ) {
                 Text(
-                    "TTS开关",
+                    stringResource(R.string.tts_switch),
                     modifier = Modifier.align(Alignment.CenterVertically),
 
                     style = MaterialTheme.typography.titleMedium
                 )
                 Switch(
+                    modifier = Modifier.padding(start = 4.dp),
                     checked = tts.isEnabled, onCheckedChange = {
                         onTtsChange(tts.copy(isEnabled = it))
                     }
@@ -95,6 +102,7 @@ fun TtsSettingsDialog(
                     onTtsChange = onTtsChange,
                 )
 
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
@@ -136,6 +144,7 @@ private fun TtsSettingsContent(
                 keys = vm.engines.map { it.name },
                 values = vm.engines.map { it.label },
                 onKeyChange = {
+                    println(it)
                     scope.launch {
                         showLoading = true
                         vm.updateEngine(it.toString())
@@ -222,7 +231,7 @@ private fun TtsSettingsContent(
                 }
             },
             label = { Text(stringResource(R.string.test)) },
-            placeholder = { Text(message) }
+            placeholder = { Text(message.replace("\n", "↩"), maxLines = 1) }
         )
     }
 }

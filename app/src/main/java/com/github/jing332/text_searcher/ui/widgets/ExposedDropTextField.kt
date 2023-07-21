@@ -34,11 +34,7 @@ fun ExposedDropTextField(
     var selectedText = values.getOrNull(max(0, keys.indexOf(key))) ?: ""
     var expanded by remember { mutableStateOf(false) }
 
-//    LaunchedEffect(key1 = values) {
-//        keys.getOrNull(values.indexOf(selectedText))?.let(onKeyChange)
-//    }
-
-    if (keys is Any){ // 当 keys 变更时:
+    LaunchedEffect(keys){
         keys.getOrNull(values.indexOf(selectedText))?.let(onKeyChange)
     }
 
