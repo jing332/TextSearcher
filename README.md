@@ -8,8 +8,8 @@
 一个基于ChatGPT的划词搜索Android应用程序
 
 # Download
-- [Github Actions](https://github.com/jing332/TextSearcher/actions) (需登录Github)
-- [Github Releases](https://github.com/jing332/TextSearcher/releases)
+- 开发版 [Github Actions](https://github.com/jing332/TextSearcher/actions) (需登录Github)
+- 稳定版 [Github Releases](https://github.com/jing332/TextSearcher/releases)
 
 # ScreenShots
 <img src="images/search.jpg" height="150px" title="主功能界面"/> | <img src="images/tts.jpg" height="150px" title="TTS"> | <img src="images/gpt_settings.jpg" height="150px" title="设置界面">
