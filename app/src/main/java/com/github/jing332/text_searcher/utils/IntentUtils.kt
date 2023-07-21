@@ -1,9 +1,11 @@
 package com.github.jing332.text_searcher.utils
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
+import androidx.core.net.toUri
 
 
 object IntentUtils {
@@ -14,5 +16,14 @@ object IntentUtils {
         intent.data = Uri.parse("http://example.com")
 
         return queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+    }
+
+    fun Context.toExternalBrowser(packageName: String, activityClassName: String, url: String) {
+        startActivity(Intent(android.content.Intent.ACTION_VIEW).apply {
+            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+            addCategory(android.content.Intent.CATEGORY_BROWSABLE);
+            data = "https://www.baidu.com".toUri()
+            setClassName(packageName, activityClassName)
+        })
     }
 }
