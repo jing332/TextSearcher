@@ -1,7 +1,10 @@
 package com.github.jing332.text_searcher.ui.search.website
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.clickable
+import android.content.ActivityNotFoundException
+import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +39,7 @@ import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.data.entites.SearchSource
 import com.github.jing332.text_searcher.model.source.WebSiteSourceEntity
 import com.github.jing332.text_searcher.ui.search.SearchSourceState
-import com.github.jing332.text_searcher.utils.IntentUtils.toExternalBrowser
+import com.github.jing332.text_searcher.utils.IntentUtils.goExternalBrowser
 import com.google.accompanist.web.AccompanistWebChromeClient
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.LoadingState
@@ -44,6 +47,7 @@ import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewState
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WebsiteSearchScreen(
     text: String,
@@ -59,20 +63,42 @@ fun WebsiteSearchScreen(
         BrowserSelectionDialog(
             onDismissRequest = { showBrowserSelectionDialog = false },
             onBrowserChange = {
-                context.toExternalBrowser(it.packageName, it.className, entity.url)
+                showBrowserSelectionDialog = false
+                try {
+                    context.goExternalBrowser(it.packageName, it.className, entity.url)
+                    onSourceChange(src.copy(sourceEntity = entity.copy(browserInfo = it)))
+                } catch (e: ActivityNotFoundException) {
+                    showBrowserSelectionDialog = true
+                }
             }
         )
-
 
     Column {
         Column(
             Modifier
                 .fillMaxWidth()
-                .clickable(
-                    enabled = true,
+                .combinedClickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = rememberRipple(bounded = true),
-                    onClick = { showBrowserSelectionDialog = true },
+                    onClick = {
+                        try {
+                            Log.d(
+                                "WebsiteSearchScreen",
+                                "goExternalBrowser(): ${entity.browserInfo}"
+                            )
+                            context.goExternalBrowser(
+                                entity.browserInfo.packageName,
+                                entity.browserInfo.className,
+                                entity.url,
+                            )
+                        } catch (e: ActivityNotFoundException) {
+                            showBrowserSelectionDialog = true
+                        }
+                    },
+                    onLongClick = {
+                        showBrowserSelectionDialog = true
+                    },
+                    onLongClickLabel = stringResource(R.string.select_browser)
                 )
         ) {
             Row(Modifier.align(Alignment.CenterHorizontally)) {

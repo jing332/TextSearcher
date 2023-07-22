@@ -67,4 +67,6 @@
     <string name="website">网页</string>
     <string name="tts_switch">TTS开关</string>
     <string name="external_browser">外部浏览器</string>
+    <string name="select_browser">选择浏览器</string>
+    <string name="search_engine">搜索引擎</string>
 </resources>

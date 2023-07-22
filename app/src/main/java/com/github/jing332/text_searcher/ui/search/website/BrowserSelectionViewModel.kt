@@ -13,6 +13,7 @@ class BrowserSelectionViewModel : ViewModel() {
     val browsers = mutableStateListOf<Browser>()
 
     fun load(packageManager: PackageManager) {
+        browsers.clear()
         packageManager.getInstalledBrowsers().forEach {
             browsers.add(
                 Browser(

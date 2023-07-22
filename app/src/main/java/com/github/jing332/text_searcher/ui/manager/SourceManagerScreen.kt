@@ -141,7 +141,7 @@ fun SourceManagerScreen(drawerState: DrawerState, vm: SourceManagerViewModel = v
                         )
 
                         DropdownMenuItem(
-                            text = { Text("搜索引擎") },
+                            text = { Text(stringResource(R.string.search_engine)) },
                             onClick = {
                                 startEditScreen(WebSiteSourceEntity())
                             }

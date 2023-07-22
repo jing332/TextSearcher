@@ -28,10 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.model.source.BrowserInfo
 import com.github.jing332.text_searcher.ui.search.BaseSearchDialog
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +56,7 @@ fun BrowserSelectionDialog(
     BaseSearchDialog(onDismissRequest = onDismissRequest) {
         Column {
             Text(
-                "选择浏览器",
+                stringResource(R.string.select_browser),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
@@ -63,11 +65,8 @@ fun BrowserSelectionDialog(
 
             LazyColumn {
                 items(vm.browsers, key = { it.info }) {
-                    Column {
-                        Item(it.name, it.icon) {
-                            onBrowserChange(it.info)
-                        }
-                        Divider(modifier = Modifier.fillMaxWidth())
+                    Item(it.name, it.icon) {
+                        onBrowserChange(it.info)
                     }
                 }
             }
@@ -78,29 +77,33 @@ fun BrowserSelectionDialog(
 
 @Composable
 private fun Item(name: String, icon: ImageBitmap, onClick: () -> Unit) {
-    Row(
-        Modifier
-            .padding(horizontal = 4.dp, vertical = 4.dp)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(),
-                onClick = onClick,
+    Column {
+        Row(
+            Modifier
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = rememberRipple(),
+                    onClick = onClick,
+                )
+                .padding(horizontal = 4.dp, vertical = 4.dp)
+        ) {
+            Image(
+                bitmap = icon,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
             )
-    ) {
-        Image(
-            bitmap = icon,
-            contentDescription = null,
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-        )
-        Text(
-            name, modifier = Modifier
-                .align(CenterVertically)
-                .weight(1f)
-                .padding(start = 8.dp),
-            style = MaterialTheme.typography.titleMedium
-        )
+            Text(
+                name,
+                modifier = Modifier
+                    .align(CenterVertically)
+                    .weight(1f)
+                    .padding(start = 8.dp),
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+        Divider(modifier = Modifier.fillMaxWidth())
     }
 }
 
@@ -109,15 +112,13 @@ private fun Item(name: String, icon: ImageBitmap, onClick: () -> Unit) {
 fun BrowserSelectionPreview() {
     val context = LocalContext.current
     var show by remember { mutableStateOf(true) }
-    if (show)
-        BrowserSelectionDialog(onDismissRequest = { show = false }, onBrowserChange = {
-            context.startActivity(Intent(Intent.ACTION_VIEW).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                addCategory(Intent.CATEGORY_BROWSABLE);
-                data = "https://www.baidu.com".toUri()
-                setClassName(it.packageName, it.className)
+    if (show) BrowserSelectionDialog(onDismissRequest = { show = false }, onBrowserChange = {
+        context.startActivity(Intent(Intent.ACTION_VIEW).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addCategory(Intent.CATEGORY_BROWSABLE);
+            data = "https://www.baidu.com".toUri()
+            setClassName(it.packageName, it.className)
 //                setClassName("mark.via.gp", "mark.via.Shell")
-            })
-        }
-        )
+        })
+    })
 }

@@ -18,7 +18,7 @@ object IntentUtils {
         return queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
     }
 
-    fun Context.toExternalBrowser(packageName: String, activityClassName: String, url: String) {
+    fun Context.goExternalBrowser(packageName: String, activityClassName: String, url: String) {
         startActivity(Intent(android.content.Intent.ACTION_VIEW).apply {
             addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
             addCategory(android.content.Intent.CATEGORY_BROWSABLE);

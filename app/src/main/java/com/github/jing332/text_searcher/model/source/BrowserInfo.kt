@@ -6,4 +6,4 @@ import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-data class BrowserInfo(val packageName: String, val className: String) : Parcelable
+data class BrowserInfo(val packageName: String = "", val className: String = "") : Parcelable
