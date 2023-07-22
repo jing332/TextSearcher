@@ -70,4 +70,5 @@
     <string name="select_browser">选择浏览器</string>
     <string name="search_engine">搜索引擎</string>
     <string name="bing_search">Bing搜索</string>
+    <string name="tts">TTS</string>
 </resources>

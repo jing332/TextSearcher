@@ -80,15 +80,8 @@ fun MainScreen(
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     onFinishedActivity: () -> Unit,
 ) {
-    val context = LocalContext.current
-//    var lastBackDownTime by remember { mutableLongStateOf(0L) }
     var toastMsg by remember { mutableStateOf("") }
     if (toastMsg.isNotEmpty()) {
-//        SweetToastUtil.SweetInfo(
-//            message = toastMsg,
-//            Toast.LENGTH_SHORT,
-//            PaddingValues(bottom = 32.dp)
-//        )
         toastMsg = ""
     }
 

@@ -7,35 +7,56 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFontFamilyResolver
+import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.getSelectedText
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
@@ -48,6 +69,7 @@ import com.github.jing332.text_searcher.model.source.ChatGptTTS
 import com.github.jing332.text_searcher.service.TtsService
 import com.github.jing332.text_searcher.ui.search.SearchSourceState
 import com.github.jing332.text_searcher.ui.search.chatgpt.tts.TtsSettingsDialog
+import com.github.jing332.text_searcher.ui.search.texttoolbar.CustomTextToolbar
 import com.github.jing332.text_searcher.ui.widgets.ExpandableText
 import kotlinx.coroutines.launch
 
@@ -115,7 +137,6 @@ private fun ChatGPTScreen(
 
     vm: GptSearchScreenViewModel = viewModel(key = id.toString())
 ) {
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
     var mTitleAppearance by remember { mutableStateOf(titleAppearance) }
@@ -269,15 +290,37 @@ private fun ChatGPTScreen(
         Spacer(modifier = Modifier.height(2.dp))
 
         Box {
-            SelectionContainer {
-                Text(
-                    text = vm.errorMessage.ifEmpty { vm.result },
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontFamily = fontFamily(mContentAppearance.fontUri),
-                    fontSize = mContentAppearance.fontSize.sp,
-                    fontWeight = FontWeight(mContentAppearance.fontWeight),
-                    lineHeight = mContentAppearance.fontSize.sp * mContentAppearance.lineWidthScale,
-                    color = if (vm.errorMessage.isEmpty()) Color.Unspecified else MaterialTheme.colorScheme.error
+            var text by remember { mutableStateOf(TextFieldValue(vm.errorMessage.ifEmpty { vm.result })) }
+            val localView = LocalView.current
+            val textToolbar = remember {
+                CustomTextToolbar(localView, onTtsRequested = {
+                    val selectedText = text.getSelectedText().text
+                    if (selectedText.isNotEmpty()) {
+                        context.startService(Intent(context, TtsService::class.java).apply {
+                            putExtra(TtsService.KEY_TTS_TEXT, selectedText)
+                            putExtra(TtsService.KEY_TTS_CONFIG, tts)
+                        })
+                    }
+                })
+            }
+
+            CompositionLocalProvider(LocalTextToolbar provides textToolbar) {
+                LaunchedEffect(key1 = vm.errorMessage, key2 = vm.result) {
+                    text = text.copy(text = vm.errorMessage.ifEmpty { vm.result })
+                }
+
+                TextWithSelectedText(
+                    value = text,
+                    onValueChange = {
+                        text = it
+                    },
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = fontFamily(mContentAppearance.fontUri),
+                        fontSize = mContentAppearance.fontSize.sp,
+                        fontWeight = FontWeight(mContentAppearance.fontWeight),
+                        lineHeight = mContentAppearance.fontSize.sp * mContentAppearance.lineWidthScale,
+                        color = if (vm.errorMessage.isEmpty()) Color.Unspecified else MaterialTheme.colorScheme.error
+                    ),
                 )
             }
         }
@@ -285,3 +328,118 @@ private fun ChatGPTScreen(
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TextWithSelectedText(
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = true,
+    textStyle: TextStyle = LocalTextStyle.current,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    prefix: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
+    supportingText: @Composable (() -> Unit)? = null,
+    isError: Boolean = false,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    singleLine: Boolean = false,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    minLines: Int = 1,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = TextFieldDefaults.shape,
+    colors: TextFieldColors = TextFieldDefaults.colors(
+        unfocusedContainerColor = Color.Transparent,
+        focusedContainerColor = Color.Transparent,
+        focusedIndicatorColor = Color.Transparent,
+        unfocusedIndicatorColor = Color.Transparent,
+    ),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    selectionColors: TextSelectionColors = TextSelectionColors(
+        MaterialTheme.colorScheme.primary,
+        MaterialTheme.colorScheme.primaryContainer
+    ),
+) {
+    // If color is not provided via the text style, use content color as a default
+    val textColor = textStyle.color.takeOrElse {
+        Color.Black
+//        colors.textColor(enabled, isError, interactionSource).value
+    }
+    val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
+
+    CompositionLocalProvider(LocalTextSelectionColors provides selectionColors) {
+        BasicTextField(
+            value = value,
+            modifier = modifier
+                .defaultMinSize(
+                    minWidth = TextFieldDefaults.MinWidth,
+                    minHeight = TextFieldDefaults.MinHeight
+                ),
+            onValueChange = onValueChange,
+            enabled = enabled,
+            readOnly = readOnly,
+            textStyle = mergedTextStyle,
+            cursorBrush = SolidColor(Color.Blue),
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            interactionSource = interactionSource,
+            singleLine = singleLine,
+            maxLines = maxLines,
+            minLines = minLines,
+            decorationBox = @Composable { innerTextField ->
+                // places leading icon, text field with label and placeholder, trailing icon
+                TextFieldDefaults.DecorationBox(
+                    value = value.text,
+                    visualTransformation = visualTransformation,
+                    innerTextField = innerTextField,
+                    placeholder = placeholder,
+                    label = label,
+                    leadingIcon = leadingIcon,
+                    trailingIcon = trailingIcon,
+                    prefix = prefix,
+                    suffix = suffix,
+                    supportingText = supportingText,
+                    shape = shape,
+                    singleLine = singleLine,
+                    enabled = enabled,
+                    isError = isError,
+                    interactionSource = interactionSource,
+                    colors = colors,
+                    contentPadding = contentPadding,
+                )
+            }
+        )
+    }
+}
+
+@Preview
+@Composable
+fun TextWithSelectedTextPreview() {
+    val selectedText = remember { mutableStateOf("") }
+    val localView = LocalView.current
+    val textToolbar = remember {
+        CustomTextToolbar(localView, onTtsRequested = {
+            println("onTtsRequested: ${selectedText.value}")
+        })
+    }
+
+    CompositionLocalProvider(LocalTextToolbar provides textToolbar) {
+        var text by remember { mutableStateOf(TextFieldValue("Hello world!")) }
+
+        TextWithSelectedText(
+            value = text,
+            onValueChange = {
+                text = it
+            },
+            textStyle = MaterialTheme.typography.bodyMedium,
+            enabled = true,
+        )
+    }
+}
