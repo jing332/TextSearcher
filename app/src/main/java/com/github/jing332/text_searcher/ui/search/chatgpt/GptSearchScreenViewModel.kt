@@ -5,30 +5,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.aallam.openai.api.BetaOpenAI
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
-import com.aallam.openai.api.exception.RateLimitException
 import com.aallam.openai.api.logging.LogLevel
 import com.aallam.openai.api.logging.Logger
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.RetryStrategy
-import com.drake.net.utils.withIO
-import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.help.LocalTtsEngineHelper
 import com.github.jing332.text_searcher.model.source.ChatGptTTS
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.coroutines.coroutineContext
 
 class GptSearchScreenViewModel : ViewModel() {
     var result by mutableStateOf("")
+    var errorMessage by mutableStateOf("")
+
     private var isLoading by mutableStateOf(false)
 
     private var mTtsEngine: LocalTtsEngineHelper? = null
@@ -89,36 +85,32 @@ class GptSearchScreenViewModel : ViewModel() {
         }
     }
 
+    /**
+     * @return true if execute
+     */
     suspend fun requestGpt(
         context: Context,
         msg: String,
         token: String,
         systemPrompt: String,
         model: String
-    ) {
-        if (isLoading) return
+    ): Boolean {
+        if (isLoading) return false
 
         result = ""
         isLoading = true
-        withIO {
-            if (token.isBlank()) {
-                result = context.getString(R.string.error_open_ai_api_key_empty)
-                return@withIO
-            }
-            try {
-                requestInternal(
-                    msg,
-                    token,
-                    systemPrompt,
-                    model
-                )
-                isLoading = false
-            } catch (e: RateLimitException) {
-                result = "RateLimit: 您已被OpenAI限制，请检查可用额度、更换代理或稍后重试。"
-            } catch (e: Exception) {
-                result = "错误: $e"
-            }
+        if (token.isBlank()) {
+            return false
         }
+        requestInternal(
+            msg,
+            token,
+            systemPrompt,
+            model
+        )
+        isLoading = false
+
+        return true
     }
 
 

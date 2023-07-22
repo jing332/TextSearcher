@@ -1,9 +1,11 @@
 package com.github.jing332.text_searcher.ui.search.chatgpt
 
+import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,6 +29,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.res.stringResource
@@ -42,6 +45,7 @@ import com.github.jing332.text_searcher.data.entites.SearchSource
 import com.github.jing332.text_searcher.model.source.ChatGptAppearance
 import com.github.jing332.text_searcher.model.source.ChatGptSourceEntity
 import com.github.jing332.text_searcher.model.source.ChatGptTTS
+import com.github.jing332.text_searcher.service.TtsService
 import com.github.jing332.text_searcher.ui.search.SearchSourceState
 import com.github.jing332.text_searcher.ui.search.chatgpt.tts.TtsSettingsDialog
 import com.github.jing332.text_searcher.ui.widgets.ExpandableText
@@ -119,19 +123,30 @@ private fun ChatGPTScreen(
 
     fun load() {
         vm.load(context)
-        if (tts.isEnabled)
-            scope.launch {
-                vm.speak(message, tts)
-            }
+        if (tts.isEnabled) {
+            context.startService(Intent(context, TtsService::class.java).apply {
+                putExtra(TtsService.KEY_TTS_TEXT, message)
+                putExtra(TtsService.KEY_TTS_CONFIG, tts)
+            })
+        }
+
+        if (token.isBlank()) {
+            vm.errorMessage = context.getString(R.string.error_open_ai_api_key_empty)
+            return
+        }
 
         vm.viewModelScope.launch {
-            vm.requestGpt(
-                context,
-                msg = message,
-                token = token,
-                model = model,
-                systemPrompt = systemPrompt,
-            )
+            try {
+                vm.requestGpt(
+                    context,
+                    msg = message,
+                    token = token,
+                    model = model,
+                    systemPrompt = systemPrompt,
+                )
+            } catch (e: Exception) {
+                vm.errorMessage = e.message ?: e.toString()
+            }
         }
     }
 
@@ -253,15 +268,18 @@ private fun ChatGPTScreen(
 
         Spacer(modifier = Modifier.height(2.dp))
 
-        SelectionContainer {
-            Text(
-                text = vm.result,
-                style = MaterialTheme.typography.bodyMedium,
-                fontFamily = fontFamily(mContentAppearance.fontUri),
-                fontSize = mContentAppearance.fontSize.sp,
-                fontWeight = FontWeight(mContentAppearance.fontWeight),
-                lineHeight = mContentAppearance.fontSize.sp * mContentAppearance.lineWidthScale,
-            )
+        Box {
+            SelectionContainer {
+                Text(
+                    text = vm.errorMessage.ifEmpty { vm.result },
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontFamily = fontFamily(mContentAppearance.fontUri),
+                    fontSize = mContentAppearance.fontSize.sp,
+                    fontWeight = FontWeight(mContentAppearance.fontWeight),
+                    lineHeight = mContentAppearance.fontSize.sp * mContentAppearance.lineWidthScale,
+                    color = if (vm.errorMessage.isEmpty()) Color.Unspecified else MaterialTheme.colorScheme.error
+                )
+            }
         }
         Spacer(modifier = Modifier.height(8.dp))
     }

@@ -46,4 +46,9 @@ class TtsSettingsViewModel : ViewModel() {
     ) {
         engineHelper.speak(text, locale, voice, speechRate, pitch, timeout)
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        engineHelper.shutdown()
+    }
 }
