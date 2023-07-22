@@ -141,9 +141,10 @@ private fun WebViewScreen(modifier: Modifier, url: String) {
                 progress = process
             )
 
+        var lastTitle by remember { mutableStateOf("") }
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = state.pageTitle ?: url,
+            text = state.pageTitle?.apply { lastTitle = this } ?: lastTitle,
             maxLines = 1,
             style = MaterialTheme.typography.titleMedium,
         )

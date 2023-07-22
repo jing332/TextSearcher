@@ -40,9 +40,9 @@ fun ExpandableText(
     lineHeight: TextUnit = LocalTextStyle.current.lineHeight,
     text: String,
     collapsedMaxLine: Int = 2,
-    showMoreText: String = stringResource(R.string.expandble_text_more),
+    showMoreText: String = stringResource(R.string.expandable_text_more),
     showMoreStyle: SpanStyle = SpanStyle(fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary),
-    showLessText: String = stringResource(R.string.expandble_text_less),
+    showLessText: String = stringResource(R.string.expandable_text_less),
     showLessStyle: SpanStyle = showMoreStyle,
     textAlign: TextAlign? = null,
 ) {

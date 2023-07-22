@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">ChatGPT文本搜索器</string>
+    <string name="app_name">文本搜索器</string>
 
     <string name="qrcode">二维码</string>
-    <string name="text_searcher_label">ChatGPT·文本搜索</string>
+    <string name="text_searcher_label">文本搜索</string>
     <string name="gpt_system_prompt">根据用户输入来输出其意义或字面意思</string>
     <string name="message_template">$text</string>
     <string name="more_options">更多选项</string>
@@ -21,8 +21,8 @@
     <string name="appearance_settings">外观设置</string>
     <string name="font_size">字体大小：%s</string>
     <string name="line_height">行间隔：%s</string>
-    <string name="expandble_text_more">" 展开"</string>
-    <string name="expandble_text_less">" 收起"</string>
+    <string name="expandable_text_more">" 展开"</string>
+    <string name="expandable_text_less">" 收起"</string>
     <string name="font_weight">字体粗细：%s</string>
     <string name="font_weight_bold">粗体</string>
     <string name="font_weight_normal">正常</string>
@@ -42,7 +42,7 @@
     <string name="font">字体</string>
     <string name="choose_font">选择字体</string>
     <string name="system_default_font">系统默认字体</string>
-    <string name="chatgpt_search_source_name">ChatGPT搜索源</string>
+    <string name="chatgpt_search_source_name">ChatGPT搜索</string>
     <string name="error_open_ai_api_key_empty">错误: 请填写OpenAI API 密钥</string>
     <string name="up_move">上移</string>
     <string name="down_move">下移</string>
@@ -69,4 +69,5 @@
     <string name="external_browser">外部浏览器</string>
     <string name="select_browser">选择浏览器</string>
     <string name="search_engine">搜索引擎</string>
+    <string name="bing_search">Bing搜索</string>
 </resources>

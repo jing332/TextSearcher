@@ -1,6 +1,5 @@
 package com.github.jing332.text_searcher.ui.search
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
@@ -12,12 +11,13 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,10 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.data.appDb
-import com.google.accompanist.web.AccompanistWebChromeClient
-import com.google.accompanist.web.AccompanistWebViewClient
-import com.google.accompanist.web.WebView
-import com.google.accompanist.web.rememberWebViewState
+import com.github.jing332.text_searcher.help.AppConfig
 import kotlinx.coroutines.launch
 
 
@@ -69,6 +66,12 @@ fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
         val sourceList = rememberSaveable { appDb.searchSource.all }
         val pages = rememberSaveable { sourceList.map { it.name } }
         val scope = rememberCoroutineScope()
+        val initialPage =
+            remember {
+                sourceList.indexOfFirst { AppConfig.lastSourceId.value == it.id }
+                    .run { if (this > -1) this else 0 }
+            }
+
         if (pages.isEmpty())
             Text(
                 stringResource(R.string.please_add_search_source),
@@ -79,17 +82,33 @@ fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
             )
         else
             Column {
-                val pagerState = rememberPagerState { pages.size }
-                TabRow(selectedTabIndex = pagerState.currentPage, indicator = { tabPositions ->
-                    TabIndicator(
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
-                    )
-                }) {
+                var lastId by remember { AppConfig.lastSourceId }
+                val pagerState = rememberPagerState(initialPage) { pages.size }
+
+                DisposableEffect(key1 = pagerState.hashCode()) {
+                    onDispose {
+                        sourceList.getOrNull(pagerState.currentPage)?.let { lastId = it.id }
+                    }
+                }
+                ScrollableTabRow(
+                    selectedTabIndex = pagerState.currentPage,
+                    indicator = { tabPositions ->
+                        TabIndicator(
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
+                        )
+                    }
+                ) {
                     pages.forEachIndexed { index, title ->
+                        val selected = index == pagerState.currentPage
                         Tab(
-                            text = { Text(title) },
-                            selected = index == pagerState.currentPage,
+                            text = {
+                                Text(
+                                    title,
+                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                                )
+                            },
+                            selected = selected,
                             onClick = {
                                 scope.launch {
                                     pagerState.animateScrollToPage(index)
@@ -106,16 +125,6 @@ fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
                 }
             }
     }
-}
-
-
-@Preview
-@Composable
-fun PreviewChatGPTSettingsDialog() {
-    var show by remember { mutableStateOf(true) }
-//    if (show) {
-//        ChatGPTAppearanceSettingsDialog(onDismissRequest = { show = false })
-//    }
 }
 
 @Preview
