@@ -3,16 +3,25 @@ package com.github.jing332.text_searcher.ui.search.website
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pullrefresh.PullRefreshIndicator
+import androidx.compose.material3.pullrefresh.pullRefresh
+import androidx.compose.material3.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +39,9 @@ import com.github.jing332.text_searcher.ui.search.SearchSourceState
 import com.github.jing332.text_searcher.utils.IntentUtils.toExternalBrowser
 import com.google.accompanist.web.AccompanistWebChromeClient
 import com.google.accompanist.web.AccompanistWebViewClient
+import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
+import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewState
 
 @Composable
@@ -52,6 +63,7 @@ fun WebsiteSearchScreen(
             }
         )
 
+
     Column {
         Column(
             Modifier
@@ -60,7 +72,7 @@ fun WebsiteSearchScreen(
                     enabled = true,
                     interactionSource = remember { MutableInteractionSource() },
                     indication = rememberRipple(bounded = true),
-                    onClick = { showBrowserSelectionDialog = true},
+                    onClick = { showBrowserSelectionDialog = true },
                 )
         ) {
             Row(Modifier.align(Alignment.CenterHorizontally)) {
@@ -73,7 +85,7 @@ fun WebsiteSearchScreen(
             }
         }
         WebViewScreen(
-            modifier = Modifier.wrapContentSize(),
+            modifier = Modifier.fillMaxHeight(),
             url = entity.url.replace("\${text}", text)
         )
     }
@@ -82,19 +94,61 @@ fun WebsiteSearchScreen(
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 private fun WebViewScreen(modifier: Modifier, url: String) {
-    val state = rememberWebViewState(
-        url = url
-    )
+    val state = rememberWebViewState(url = url)
+    val navigator = rememberWebViewNavigator()
+
     val client = remember {
         object : AccompanistWebViewClient() {}
     }
     val chromeClient = remember {
-        object : AccompanistWebChromeClient() {}
+        object : AccompanistWebChromeClient() {
+        }
     }
-    WebView(
-        modifier = modifier, state = state,
-        onCreated = { it.settings.javaScriptEnabled = true },
-        client = client,
-        chromeClient = chromeClient,
-    )
+
+    Column(modifier = modifier) {
+        val process =
+            if (state.loadingState is LoadingState.Loading) (state.loadingState as LoadingState.Loading).progress else 0f
+
+        if (process > 0)
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth(),
+                progress = process
+            )
+
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = state.pageTitle ?: url,
+            maxLines = 1,
+            style = MaterialTheme.typography.titleMedium,
+        )
+
+        val refreshState = rememberPullRefreshState(refreshing = state.isLoading, onRefresh = {
+            navigator.reload()
+        })
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pullRefresh(refreshState)
+        ) {
+            val scrollState = rememberScrollState()
+            WebView(
+                modifier = Modifier.verticalScroll(scrollState),
+                state = state,
+                navigator = navigator,
+                onCreated = {
+                    it.settings.javaScriptEnabled = true
+                },
+                client = client,
+                chromeClient = chromeClient,
+            )
+
+            Column(Modifier.fillMaxWidth()) {
+                PullRefreshIndicator(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    refreshing = refreshState.refreshing,
+                    state = refreshState
+                )
+            }
+        }
+    }
 }
