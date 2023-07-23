@@ -3,6 +3,7 @@ package com.github.jing332.text_searcher.service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import android.os.SystemClock
 import android.util.Log
 import com.github.jing332.text_searcher.help.LocalTtsEngineHelper
 import com.github.jing332.text_searcher.model.source.ChatGptTTS
@@ -11,8 +12,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.Locale
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 class TtsService : Service() {
     companion object {
@@ -20,11 +26,20 @@ class TtsService : Service() {
 
         const val KEY_TTS_CONFIG = "tts_config"
         const val KEY_TTS_TEXT = "tts_text"
+
+        private val timeout = 15.minutes.toLong(DurationUnit.MILLISECONDS)
     }
 
     private var scope = CoroutineScope(Dispatchers.IO + Job())
     private var mTtsEngine: LocalTtsEngineHelper? = null
     private val channel = Channel<Pair<String, ChatGptTTS>>(Channel.UNLIMITED)
+
+    // 超时自动关闭服务
+    private var mLastUpdateTime: Long = 0L
+    private fun updateLastTime(){
+        mLastUpdateTime = SystemClock.elapsedRealtime()
+    }
+
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -32,9 +47,22 @@ class TtsService : Service() {
         Log.d(TAG, "onCreate: ...")
         super.onCreate()
 
+        scope.launch {
+            while (coroutineContext.isActive) {
+                delay(1.minutes)
+                val currentTime = SystemClock.elapsedRealtime()
+                val timeDiff = currentTime - mLastUpdateTime
+                if (timeDiff > timeout){
+                    stopSelf()
+                }
+            }
+        }
+
         mTtsEngine = mTtsEngine ?: LocalTtsEngineHelper(this@TtsService)
         scope.launch {
             for (pair in channel) {
+                updateLastTime()
+
                 val config = pair.second
                 val text = pair.first
                 mTtsEngine?.apply {
