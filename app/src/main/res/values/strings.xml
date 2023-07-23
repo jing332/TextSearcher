@@ -71,4 +71,9 @@
     <string name="search_engine">搜索引擎</string>
     <string name="bing_search">Bing搜索</string>
     <string name="tts">TTS</string>
+    <string name="preference">偏好设置</string>
+    <string name="search_windows_full_screen">搜索窗口全屏</string>
+    <string name="search_window_full_screen_msg">开启后，搜索窗口将取消水平边距以全屏。</string>
+    <string name="label_horizontal_margin">水平边距：%1$sdp</string>
+    <string name="labe_vertical_margin">垂直边距：%1$sdp</string>
 </resources>

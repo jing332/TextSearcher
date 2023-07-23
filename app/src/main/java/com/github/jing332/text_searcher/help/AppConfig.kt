@@ -3,7 +3,6 @@ package com.github.jing332.text_searcher.help
 import android.content.Context
 import com.funny.data_saver.core.DataSaverPreferences
 import com.funny.data_saver.core.mutableDataSaverStateOf
-import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.app
 import com.github.jing332.text_searcher.const.ConfigConst
 
@@ -23,6 +22,11 @@ object AppConfig {
         initialValue = ""
     )
 
+    var isWindowFullScreen = mutableDataSaverStateOf(
+        dataSaverInterface = dataSaverPref,
+        key = ConfigConst.KEY_IS_WINDOW_FULL_SCREEN,
+        initialValue = false
+    )
 
     fun fillDefaultValues(context: Context) {
 //        if (systemPrompt.value.isEmpty())

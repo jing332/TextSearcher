@@ -28,6 +28,7 @@ import com.github.jing332.text_searcher.data.entites.SearchSource
 import com.github.jing332.text_searcher.help.AppConfig
 import com.github.jing332.text_searcher.model.source.ChatGptSourceEntity
 import com.github.jing332.text_searcher.model.source.WebSiteSourceEntity
+import com.github.jing332.text_searcher.ui.preference.PreferenceScreen
 import com.github.jing332.text_searcher.ui.theme.TxtSearcherTheme
 import com.github.jing332.text_searcher.ui.widgets.TransparentSystemBars
 
@@ -101,6 +102,10 @@ class MainActivity : ComponentActivity() {
                             navController.popBackStack()
                         })
                     }
+                }
+
+                composable(AppNavRoutes.Preferences.route){
+                    PreferenceScreen(drawerState)
                 }
 
                 composable(AppNavRoutes.About.route) {

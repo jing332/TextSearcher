@@ -10,5 +10,6 @@ sealed class AppNavRoutes(@StringRes val titleResId: Int, val route: String) {
     }
 
     //    object DictFileManager : AppNavRoutes(R.string.confirm, "DictFileManager")
+    object Preferences : AppNavRoutes(R.string.preference, "PreferenceScreen")
     object About : AppNavRoutes(R.string.about, "About")
 }

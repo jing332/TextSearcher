@@ -32,22 +32,6 @@ class GptSearchScreenViewModel : ViewModel() {
         mTtsEngine = mTtsEngine ?: LocalTtsEngineHelper(context)
     }
 
-    suspend fun speak(text: String, ttsConfig: ChatGptTTS) {
-        mTtsEngine?.apply {
-            setEngine(ttsConfig.engine)
-            val locale =
-                if (ttsConfig.locale.isBlank()) null else Locale.forLanguageTag(ttsConfig.locale)
-            val voice = mTtsEngine?.voices?.find { it.name == ttsConfig.voice }
-            mTtsEngine?.speak(
-                text = text,
-                locale = locale,
-                voice = voice,
-                speechRate = ttsConfig.speechRate,
-                pitch = ttsConfig.pitch
-            )
-        }
-    }
-
     @OptIn(BetaOpenAI::class)
     suspend fun requestInternal(
         msg: String,
@@ -57,7 +41,7 @@ class GptSearchScreenViewModel : ViewModel() {
     ) {
         val openAI = OpenAI(
             token = token,
-            retry = RetryStrategy(1),
+            retry = RetryStrategy(0),
             logging = LoggingConfig(logger = Logger.Empty, logLevel = LogLevel.None)
             //timeout = Timeout(request = 8.seconds, connect = 8.seconds, socket = 8.seconds),
 //            proxy = ProxyConfig.Http("http://127.0.0.1:10801")

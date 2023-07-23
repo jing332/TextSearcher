@@ -22,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
@@ -180,6 +181,7 @@ private fun DrawerContent(
             onClick = onClick,
         )
     }
+
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         Spacer(modifier = Modifier.height(24.dp))
         val context = LocalContext.current
@@ -188,10 +190,8 @@ private fun DrawerContent(
         val scope = rememberCoroutineScope()
 
         var isBuildTimeExpanded by remember { mutableStateOf(false) }
-        val versionNameText = remember {
-            "version"
-//            "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
-        }
+        val versionNameText =
+            remember { "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})" }
         Column(modifier = Modifier
             .padding(end = 4.dp)
             .clip(MaterialTheme.shapes.small)
@@ -219,11 +219,13 @@ private fun DrawerContent(
                 Column(modifier = Modifier.align(Alignment.CenterVertically)) {
                     Text(
                         text = stringResource(id = R.string.app_name),
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
                     )
                     Text(
                         text = versionNameText,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
                     )
                 }
             }
@@ -251,6 +253,8 @@ private fun DrawerContent(
 //                isVisibleThemeDialog.value = true
 //            },
 //        )
+
+        drawerItem(Icons.Default.Settings, AppNavRoutes.Preferences)
         drawerItem(Icons.Filled.Info, AppNavRoutes.About)
     }
 }

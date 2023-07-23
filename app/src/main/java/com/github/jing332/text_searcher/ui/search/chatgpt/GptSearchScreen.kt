@@ -281,14 +281,16 @@ private fun ChatGPTScreen(
             return FontFamily.Default
         }
         ExpandableText(
+            modifier = Modifier.padding(
+                horizontal = mTitleAppearance.horizontalMargin.dp,
+                vertical = mTitleAppearance.verticalMargin.dp
+            ),
             text = message, style = MaterialTheme.typography.titleMedium,
             fontFamily = fontFamily(mTitleAppearance.fontUri),
             fontSize = mTitleAppearance.fontSize.sp,
             lineHeight = mTitleAppearance.fontSize.sp * mTitleAppearance.lineWidthScale,
             fontWeight = FontWeight(mTitleAppearance.fontWeight)
         )
-
-        Spacer(modifier = Modifier.height(2.dp))
 
         Box {
             var text by remember { mutableStateOf(TextFieldValue(vm.errorMessage.ifEmpty { vm.result })) }
@@ -311,6 +313,10 @@ private fun ChatGPTScreen(
                 }
 
                 TextWithSelectedText(
+                    modifier = Modifier.padding(
+                        horizontal = mContentAppearance.horizontalMargin.dp,
+                        vertical = mContentAppearance.verticalMargin.dp
+                    ),
                     value = text,
                     onValueChange = {
                         text = it

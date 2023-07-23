@@ -22,7 +22,11 @@ data class ChatGptAppearance(
 
     val fontWeight: Int = FontWeight.Normal.weight,
     val fontSize: Int,
-    val lineWidthScale: Float
+    val lineWidthScale: Float,
+
+    // Unit: DP
+    val horizontalMargin: Float = 2f,
+    val verticalMargin: Float = 2f,
 ) : Parcelable
 
 @OptIn(ExperimentalSerializationApi::class)

@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.github.jing332.text_searcher.R
 import com.github.jing332.text_searcher.data.appDb
 import com.github.jing332.text_searcher.help.AppConfig
@@ -49,7 +51,14 @@ fun TabIndicator(color: Color, modifier: Modifier = Modifier) {
 
 @Composable
 fun BaseSearchDialog(onDismissRequest: () -> Unit, content: @Composable () -> Unit) {
-    Dialog(onDismissRequest = onDismissRequest) {
+    val isFullScreen by remember { AppConfig.isWindowFullScreen }
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = !isFullScreen,
+            decorFitsSystemWindows = !isFullScreen
+        )
+    ) {
         Surface(
             tonalElevation = 4.dp,
             shape = MaterialTheme.shapes.small,
@@ -91,6 +100,7 @@ fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
                     }
                 }
                 ScrollableTabRow(
+                    modifier = Modifier.fillMaxWidth(),
                     selectedTabIndex = pagerState.currentPage,
                     indicator = { tabPositions ->
                         TabIndicator(
@@ -130,9 +140,11 @@ fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
 @Preview
 @Composable
 private fun PreviewSearcherDialog() {
-    var isShow by remember { mutableStateOf(true) }
-    if (isShow) SearcherDialog(
-        onDismissRequest = { isShow = false },
-        inputText = "帝国主义\n军国主义\n111"
-    )
+    MaterialTheme {
+        var isShow by remember { mutableStateOf(true) }
+        if (isShow) SearcherDialog(
+            onDismissRequest = { isShow = false },
+            inputText = "帝国主义\n军国主义\n111"
+        )
+    }
 }

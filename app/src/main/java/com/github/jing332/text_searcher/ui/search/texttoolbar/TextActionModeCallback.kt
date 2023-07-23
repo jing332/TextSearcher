@@ -71,6 +71,8 @@ class TextActionModeCallback(
         addOrRemoveMenuItem(menu, MenuItemOption.Paste, onPasteRequested)
         addOrRemoveMenuItem(menu, MenuItemOption.Cut, onCutRequested)
         addOrRemoveMenuItem(menu, MenuItemOption.SelectAll, onSelectAllRequested)
+
+        addOrRemoveMenuItem(menu, MenuItemOption.TTS, onTtsRequested)
     }
 
     internal fun addMenuItem(menu: Menu, item: MenuItemOption) {

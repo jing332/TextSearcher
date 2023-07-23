@@ -16,6 +16,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Divider
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -74,7 +75,7 @@ fun GptAppearanceSettingsScreen(
                     text = { Text(title) },
                     selected = index == pagerState.currentPage,
                     onClick = {
-                        scope.launch { pagerState.scrollToPage(index) }
+                        scope.launch { pagerState.animateScrollToPage(index) }
                     },
                 )
             }
@@ -98,6 +99,16 @@ fun GptAppearanceSettingsScreen(
                         onLineHeightChange = {
                             onTitleAppearanceChange(titleAppearance.copy(lineWidthScale = it))
                         },
+
+                        horizontalMargin = titleAppearance.horizontalMargin,
+                        onHorizontalMarginChange = {
+                            onTitleAppearanceChange(titleAppearance.copy(horizontalMargin = it))
+                        },
+
+                        verticalMargin = titleAppearance.verticalMargin,
+                        onVerticalMarginChange = {
+                            onTitleAppearanceChange(titleAppearance.copy(verticalMargin = it))
+                        },
                     )
                 }
 
@@ -119,6 +130,16 @@ fun GptAppearanceSettingsScreen(
                         lineHeight = contentAppearance.lineWidthScale,
                         onLineHeightChange = {
                             onContentAppearanceChange(contentAppearance.copy(lineWidthScale = it))
+                        },
+
+                        horizontalMargin = contentAppearance.horizontalMargin,
+                        onHorizontalMarginChange = {
+                            onContentAppearanceChange(contentAppearance.copy(horizontalMargin = it))
+                        },
+
+                        verticalMargin = contentAppearance.verticalMargin,
+                        onVerticalMarginChange = {
+                            onContentAppearanceChange(contentAppearance.copy(verticalMargin = it))
                         },
                     )
                 }
@@ -194,6 +215,12 @@ private fun TextStyleSettingsScreen(
 
     lineHeight: Float,
     onLineHeightChange: (Float) -> Unit,
+
+    horizontalMargin: Float,
+    onHorizontalMarginChange: (Float) -> Unit,
+
+    verticalMargin: Float,
+    onVerticalMarginChange: (Float) -> Unit,
 ) {
     val context = LocalContext.current
     var showFontSelectionDialog by remember { mutableStateOf(false) }
@@ -271,6 +298,32 @@ private fun TextStyleSettingsScreen(
             steps = 120,
         ) {
             Text(stringResource(R.string.line_height, String.format("%.2f", lineHeight)))
+        }
+
+        Divider(Modifier.fillMaxWidth())
+
+        LabelSlider(
+            valueRange = 0.0f..48.0f,
+            value = horizontalMargin, onValueChange = onHorizontalMarginChange
+        ) {
+            Text(
+                stringResource(
+                    R.string.label_horizontal_margin,
+                    String.format("%.1f", horizontalMargin)
+                )
+            )
+        }
+
+        LabelSlider(
+            valueRange = 0.0f..48.0f,
+            value = verticalMargin, onValueChange = onVerticalMarginChange
+        ) {
+            Text(
+                stringResource(
+                    R.string.labe_vertical_margin,
+                    String.format("%.1f", verticalMargin)
+                )
+            )
         }
     }
 }
