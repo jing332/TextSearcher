@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFontFamilyResolver
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -359,6 +360,8 @@ fun TextWithSelectedText(
         focusedContainerColor = Color.Transparent,
         focusedIndicatorColor = Color.Transparent,
         unfocusedIndicatorColor = Color.Transparent,
+        focusedTextColor = LocalTextStyle.current.color,
+        unfocusedTextColor = LocalTextStyle.current.color
     ),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     selectionColors: TextSelectionColors = TextSelectionColors(
@@ -367,13 +370,13 @@ fun TextWithSelectedText(
     ),
 ) {
     // If color is not provided via the text style, use content color as a default
-    val textColor = textStyle.color.takeOrElse {
-        Color.Black
-//        colors.textColor(enabled, isError, interactionSource).value
-    }
+    val textColor = textStyle.color.takeOrElse { MaterialTheme.colorScheme.onBackground }
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
-    CompositionLocalProvider(LocalTextSelectionColors provides selectionColors) {
+    CompositionLocalProvider(
+        LocalTextSelectionColors provides selectionColors,
+        LocalTextInputService provides null,
+    ) {
         BasicTextField(
             value = value,
             modifier = modifier
