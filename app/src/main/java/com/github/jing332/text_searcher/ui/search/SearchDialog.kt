@@ -11,10 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,10 +57,12 @@ fun BaseSearchDialog(onDismissRequest: () -> Unit, content: @Composable () -> Un
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(
             usePlatformDefaultWidth = !isFullScreen,
-            decorFitsSystemWindows = !isFullScreen
+            decorFitsSystemWindows = !isFullScreen,
+            dismissOnClickOutside = true,
         )
     ) {
         Surface(
+            modifier = Modifier.fillMaxWidth(),
             tonalElevation = 4.dp,
             shape = MaterialTheme.shapes.small,
         ) {
@@ -90,7 +93,7 @@ fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
                 modifier = Modifier.padding(8.dp)
             )
         else
-            Column {
+            Column(Modifier.fillMaxWidth()) {
                 var lastId by remember { AppConfig.lastSourceId }
                 val pagerState = rememberPagerState(initialPage) { pages.size }
 
@@ -99,14 +102,16 @@ fun SearcherDialog(onDismissRequest: () -> Unit, inputText: String) {
                         sourceList.getOrNull(pagerState.currentPage)?.let { lastId = it.id }
                     }
                 }
-                ScrollableTabRow(
-                    modifier = Modifier.fillMaxWidth(),
+                TabRow(
                     selectedTabIndex = pagerState.currentPage,
                     indicator = { tabPositions ->
                         TabIndicator(
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
                         )
+                    },
+                    divider = {
+                        Divider(Modifier.fillMaxWidth())
                     }
                 ) {
                     pages.forEachIndexed { index, title ->

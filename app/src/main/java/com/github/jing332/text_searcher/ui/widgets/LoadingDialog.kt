@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -76,7 +77,7 @@ fun LoadingDialog(onDismissRequest: () -> Unit, dismissOnBackPress: Boolean = fa
             tonalElevation = 4.dp,
             shape = MaterialTheme.shapes.medium,
         ) {
-            Column(modifier = Modifier.padding(horizontal = 48.dp, vertical = 12.dp)) {
+            Column(modifier = Modifier.padding(horizontal = 48.dp, vertical = 12.dp).wrapContentWidth()) {
                 ProgressIndicatorLoading(
                     progressIndicatorSize = 64.dp,
                     progressIndicatorColor = MaterialTheme.colorScheme.primary

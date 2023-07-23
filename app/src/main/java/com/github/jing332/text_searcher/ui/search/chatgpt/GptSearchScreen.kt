@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
@@ -49,6 +51,7 @@ import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -184,6 +187,7 @@ private fun ChatGPTScreen(
             Column(
                 modifier
                     .weight(1f)
+                    .clip(MaterialTheme.shapes.extraSmall)
                     .clickable(
                         enabled = true,
                         interactionSource = remember { MutableInteractionSource() },
@@ -192,10 +196,13 @@ private fun ChatGPTScreen(
                     )
             ) {
                 Row(Modifier.align(Alignment.CenterHorizontally)) {
-                    Text(text = stringResource(R.string.appearance_settings))
+                    Text(
+                        text = stringResource(R.string.appearance_settings),
+                        fontWeight = if (gptAppearanceScreenVisible) FontWeight.Bold else FontWeight.Normal
+                    )
                     Icon(
-                        modifier = Modifier.size(20.dp),
-                        imageVector = Icons.Filled.Settings,
+                        modifier = Modifier.size(24.dp),
+                        imageVector = Icons.Filled.ColorLens,
                         contentDescription = stringResource(R.string.appearance_settings),
                     )
                 }
@@ -230,6 +237,7 @@ private fun ChatGPTScreen(
             Column(
                 Modifier
                     .weight(1f)
+                    .clip(MaterialTheme.shapes.extraSmall)
                     .clickable(
                         enabled = true,
                         interactionSource = remember { MutableInteractionSource() },
@@ -239,13 +247,12 @@ private fun ChatGPTScreen(
             ) {
                 Row(
                     Modifier.align(Alignment.CenterHorizontally)
-
                 ) {
                     Text(text = stringResource(R.string.tts_settings))
                     Icon(
-                        modifier = Modifier.size(20.dp),
-                        imageVector = Icons.Filled.Settings,
+                        modifier = Modifier.size(24.dp),
                         contentDescription = stringResource(R.string.tts_settings),
+                        painter = painterResource(id = R.drawable.ic_tts)
                     )
                 }
             }
