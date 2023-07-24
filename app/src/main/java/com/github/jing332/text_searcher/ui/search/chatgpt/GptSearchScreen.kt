@@ -1,7 +1,14 @@
+@file:Suppress("DEPRECATION")
+
 package com.github.jing332.text_searcher.ui.search.chatgpt
 
+import android.annotation.SuppressLint
+import android.app.Service
 import android.content.Intent
 import android.net.Uri
+import android.os.Vibrator
+import android.os.VibratorManager
+import android.view.HapticFeedbackConstants
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,7 +18,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,7 +31,6 @@ import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ColorLens
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -51,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalTextInputService
@@ -124,6 +130,7 @@ fun GptSearchScreen(
     )
 }
 
+@SuppressLint("MissingPermission")
 @Composable
 private fun ChatGPTScreen(
     id: Long,
@@ -151,14 +158,16 @@ private fun ChatGPTScreen(
     var mTitleAppearance by remember { mutableStateOf(titleAppearance) }
     var mContentAppearance by remember { mutableStateOf(contentAppearance) }
 
+    fun tts() {
+        context.startService(Intent(context, TtsService::class.java).apply {
+            putExtra(TtsService.KEY_TTS_TEXT, message)
+            putExtra(TtsService.KEY_TTS_CONFIG, tts)
+        })
+    }
+
     fun load() {
         vm.load(context)
-        if (tts.isEnabled) {
-            context.startService(Intent(context, TtsService::class.java).apply {
-                putExtra(TtsService.KEY_TTS_TEXT, message)
-                putExtra(TtsService.KEY_TTS_CONFIG, tts)
-            })
-        }
+        if (tts.isEnabled) tts()
 
         if (token.isBlank()) {
             vm.errorMessage = context.getString(R.string.error_open_ai_api_key_empty)
@@ -245,12 +254,7 @@ private fun ChatGPTScreen(
                         }
                     )
                 }
-                /*Divider(
-                    Modifier
-                        .fillMaxHeight()
-                        .width(1.dp)
-                        .padding(horizontal = 2.dp)
-                )*/
+
                 Column(
                     Modifier
                         .weight(1f)
@@ -305,11 +309,9 @@ private fun ChatGPTScreen(
                 return FontFamily.Default
             }
 
-            val refreshState = rememberPullRefreshState(refreshing = vm.isLoading, onRefresh = {
-                state.requestLoad = true
-            })
-
-
+            val v = LocalView.current
+            val vibrator =
+                remember { context.getSystemService(Service.VIBRATOR_SERVICE) as Vibrator }
             ExpandableText(
                 modifier = Modifier.padding(
                     horizontal = mTitleAppearance.horizontalMargin.dp,
@@ -319,7 +321,13 @@ private fun ChatGPTScreen(
                 fontFamily = fontFamily(mTitleAppearance.fontUri),
                 fontSize = mTitleAppearance.fontSize.sp,
                 lineHeight = mTitleAppearance.fontSize.sp * mTitleAppearance.lineWidthScale,
-                fontWeight = FontWeight(mTitleAppearance.fontWeight)
+                fontWeight = FontWeight(mTitleAppearance.fontWeight),
+                onLongClickLabel = "TTS",
+                onLongClick = {
+                    v.isHapticFeedbackEnabled = true
+                    v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                    tts()
+                }
             )
 
             Box {

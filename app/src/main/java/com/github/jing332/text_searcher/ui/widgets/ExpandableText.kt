@@ -1,7 +1,8 @@
 package com.github.jing332.text_searcher.ui.widgets
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.LocalTextStyle
@@ -28,6 +29,7 @@ import com.github.jing332.text_searcher.R
 
 
 // from https://stackoverflow.com/a/72982110/13197001
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ExpandableText(
     modifier: Modifier = Modifier,
@@ -41,19 +43,34 @@ fun ExpandableText(
     text: String,
     collapsedMaxLine: Int = 2,
     showMoreText: String = stringResource(R.string.expandable_text_more),
-    showMoreStyle: SpanStyle = SpanStyle(fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary),
+    showMoreStyle: SpanStyle = SpanStyle(
+        fontWeight = FontWeight.ExtraBold,
+        color = MaterialTheme.colorScheme.primary
+    ),
     showLessText: String = stringResource(R.string.expandable_text_less),
     showLessStyle: SpanStyle = showMoreStyle,
     textAlign: TextAlign? = null,
+
+    onLongClick: (() -> Unit)? = null,
+    onLongClickLabel: String? = null
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     var clickable by remember { mutableStateOf(false) }
     var lastCharIndex by remember { mutableIntStateOf(0) }
-    Box(modifier = Modifier
-        .clickable(clickable) {
-            isExpanded = !isExpanded
-        }
-        .then(modifier)) {
+
+    Box(
+        modifier = Modifier
+            .combinedClickable(
+                onClick = {
+                    if (clickable)
+                        isExpanded = !isExpanded
+                },
+                onLongClick = onLongClick,
+                onLongClickLabel = onLongClickLabel,
+                onClickLabel = if (isExpanded) showLessText else showMoreText
+            )
+            .then(modifier)
+    ) {
         Text(
             modifier = textModifier
                 .fillMaxWidth()
