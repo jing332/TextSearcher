@@ -16,16 +16,14 @@ import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.RetryStrategy
 import com.github.jing332.text_searcher.help.LocalTtsEngineHelper
-import com.github.jing332.text_searcher.model.source.ChatGptTTS
 import kotlinx.coroutines.isActive
-import java.util.Locale
 import kotlin.coroutines.coroutineContext
 
 class GptSearchScreenViewModel : ViewModel() {
     var result by mutableStateOf("")
     var errorMessage by mutableStateOf("")
 
-    private var isLoading by mutableStateOf(false)
+    var isLoading by mutableStateOf(false)
 
     private var mTtsEngine: LocalTtsEngineHelper? = null
     fun load(context: Context) {
@@ -73,28 +71,31 @@ class GptSearchScreenViewModel : ViewModel() {
      * @return true if execute
      */
     suspend fun requestGpt(
-        context: Context,
         msg: String,
         token: String,
         systemPrompt: String,
         model: String
-    ): Boolean {
-        if (isLoading) return false
+    ) {
+        if (isLoading) return
 
         result = ""
         isLoading = true
         if (token.isBlank()) {
-            return false
+            throw IllegalArgumentException("token is blank")
+        } else {
+            try {
+                requestInternal(
+                    msg,
+                    token,
+                    systemPrompt,
+                    model
+                )
+            } catch (e: Exception) {
+                isLoading = false
+                throw e
+            }
         }
-        requestInternal(
-            msg,
-            token,
-            systemPrompt,
-            model
-        )
         isLoading = false
-
-        return true
     }
 
 

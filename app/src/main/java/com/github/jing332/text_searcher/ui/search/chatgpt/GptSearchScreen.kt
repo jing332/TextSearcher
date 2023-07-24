@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,6 +34,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.pullrefresh.PullRefreshIndicator
+import androidx.compose.material3.pullrefresh.pullRefresh
+import androidx.compose.material3.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -163,12 +168,16 @@ private fun ChatGPTScreen(
         vm.viewModelScope.launch {
             try {
                 vm.requestGpt(
-                    context,
                     msg = message,
                     token = token,
                     model = model,
                     systemPrompt = systemPrompt,
                 )
+            } catch (e: IllegalArgumentException) {
+                if (e.message?.contains("token") == true) {
+                    vm.errorMessage = context.getString(R.string.error_open_ai_api_key_empty)
+                } else
+                    vm.errorMessage = e.message ?: e.toString()
             } catch (e: Exception) {
                 vm.errorMessage = e.message ?: e.toString()
             }
@@ -182,163 +191,184 @@ private fun ChatGPTScreen(
 
     var gptAppearanceScreenVisible by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
-    Column(modifier.verticalScroll(scrollState)) {
-        Row {
-            Column(
-                modifier
-                    .weight(1f)
-                    .clip(MaterialTheme.shapes.extraSmall)
-                    .clickable(
-                        enabled = true,
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = rememberRipple(bounded = true),
-                        onClick = { gptAppearanceScreenVisible = !gptAppearanceScreenVisible },
-                    )
-            ) {
-                Row(Modifier.align(Alignment.CenterHorizontally)) {
-                    Text(
-                        text = stringResource(R.string.appearance_settings),
-                        fontWeight = if (gptAppearanceScreenVisible) FontWeight.Bold else FontWeight.Normal
-                    )
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        imageVector = Icons.Filled.ColorLens,
-                        contentDescription = stringResource(R.string.appearance_settings),
-                    )
-                }
-            }
 
-            var showTtsSettings by remember { mutableStateOf(false) }
-            if (showTtsSettings) {
-                var vTts by remember { mutableStateOf(tts) }
-                var vTestText by remember { mutableStateOf(testText) }
-
-                TtsSettingsDialog(
-                    onDismissRequest = { showTtsSettings = false },
-                    tts = vTts,
-                    message = message,
-                    testText = vTestText,
-                    onTestTextChange = {
-                        vTestText = it
-                        onTestTextChange(it)
-                    },
-                    onTtsChange = {
-                        vTts = it
-                        onTtsChange(it)
-                    }
-                )
-            }
-            /*Divider(
-                Modifier
-                    .fillMaxHeight()
-                    .width(1.dp)
-                    .padding(horizontal = 2.dp)
-            )*/
-            Column(
-                Modifier
-                    .weight(1f)
-                    .clip(MaterialTheme.shapes.extraSmall)
-                    .clickable(
-                        enabled = true,
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = rememberRipple(bounded = true),
-                        onClick = { showTtsSettings = true },
-                    )
-            ) {
-                Row(
-                    Modifier.align(Alignment.CenterHorizontally)
+    val refreshState = rememberPullRefreshState(refreshing = vm.isLoading, onRefresh = {
+        state.requestLoad = true
+    })
+    Box(
+        Modifier
+            .pullRefresh(refreshState)
+    ) {
+        Column(modifier.verticalScroll(scrollState)) {
+            Row {
+                Column(
+                    modifier
+                        .weight(1f)
+                        .clip(MaterialTheme.shapes.extraSmall)
+                        .clickable(
+                            enabled = true,
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = rememberRipple(bounded = true),
+                            onClick = { gptAppearanceScreenVisible = !gptAppearanceScreenVisible },
+                        )
                 ) {
-                    Text(text = stringResource(R.string.tts_settings))
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        contentDescription = stringResource(R.string.tts_settings),
-                        painter = painterResource(id = R.drawable.ic_tts)
+                    Row(Modifier.align(Alignment.CenterHorizontally)) {
+                        Text(
+                            text = stringResource(R.string.appearance_settings),
+                            fontWeight = if (gptAppearanceScreenVisible) FontWeight.Bold else FontWeight.Normal
+                        )
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = Icons.Filled.ColorLens,
+                            contentDescription = stringResource(R.string.appearance_settings),
+                        )
+                    }
+                }
+
+                var showTtsSettings by remember { mutableStateOf(false) }
+                if (showTtsSettings) {
+                    var vTts by remember { mutableStateOf(tts) }
+                    var vTestText by remember { mutableStateOf(testText) }
+
+                    TtsSettingsDialog(
+                        onDismissRequest = { showTtsSettings = false },
+                        tts = vTts,
+                        message = message,
+                        testText = vTestText,
+                        onTestTextChange = {
+                            vTestText = it
+                            onTestTextChange(it)
+                        },
+                        onTtsChange = {
+                            vTts = it
+                            onTtsChange(it)
+                        }
+                    )
+                }
+                /*Divider(
+                    Modifier
+                        .fillMaxHeight()
+                        .width(1.dp)
+                        .padding(horizontal = 2.dp)
+                )*/
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .clip(MaterialTheme.shapes.extraSmall)
+                        .clickable(
+                            enabled = true,
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = rememberRipple(bounded = true),
+                            onClick = { showTtsSettings = true },
+                        )
+                ) {
+                    Row(
+                        Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(text = stringResource(R.string.tts_settings))
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            contentDescription = stringResource(R.string.tts_settings),
+                            painter = painterResource(id = R.drawable.ic_tts)
+                        )
+                    }
+                }
+            }
+
+            // GPT外观设置
+            if (gptAppearanceScreenVisible) GptAppearanceSettingsScreen(
+                Modifier
+                    .animateContentSize()
+                    .padding(horizontal = 2.dp),
+                titleAppearance = mTitleAppearance,
+                onTitleAppearanceChange = {
+                    onTitleAppearanceChange(it)
+                    mTitleAppearance = it
+                },
+                contentAppearance = mContentAppearance,
+                onContentAppearanceChange = {
+                    onContentAppearanceChange(it)
+                    mContentAppearance = it
+                },
+            )
+            val ffResolver = LocalFontFamilyResolver.current
+            fun fontFamily(uri: Uri): FontFamily {
+                try {
+                    context.contentResolver.openFileDescriptor(uri, "r")?.use {
+                        return FontFamily(Font(it)).apply {
+                            ffResolver.resolve(this)
+                        }
+                    }
+                } catch (_: Exception) {
+                }
+
+                return FontFamily.Default
+            }
+
+            val refreshState = rememberPullRefreshState(refreshing = vm.isLoading, onRefresh = {
+                state.requestLoad = true
+            })
+
+
+            ExpandableText(
+                modifier = Modifier.padding(
+                    horizontal = mTitleAppearance.horizontalMargin.dp,
+                    vertical = mTitleAppearance.verticalMargin.dp
+                ),
+                text = message, style = MaterialTheme.typography.titleMedium,
+                fontFamily = fontFamily(mTitleAppearance.fontUri),
+                fontSize = mTitleAppearance.fontSize.sp,
+                lineHeight = mTitleAppearance.fontSize.sp * mTitleAppearance.lineWidthScale,
+                fontWeight = FontWeight(mTitleAppearance.fontWeight)
+            )
+
+            Box {
+                var text by remember { mutableStateOf(TextFieldValue(vm.errorMessage.ifEmpty { vm.result })) }
+                val localView = LocalView.current
+                val textToolbar = remember {
+                    CustomTextToolbar(localView, onTtsRequested = {
+                        val selectedText = text.getSelectedText().text
+                        if (selectedText.isNotEmpty()) {
+                            context.startService(Intent(context, TtsService::class.java).apply {
+                                putExtra(TtsService.KEY_TTS_TEXT, selectedText)
+                                putExtra(TtsService.KEY_TTS_CONFIG, tts)
+                            })
+                        }
+                    })
+                }
+
+                CompositionLocalProvider(LocalTextToolbar provides textToolbar) {
+                    LaunchedEffect(key1 = vm.errorMessage, key2 = vm.result) {
+                        text = text.copy(text = vm.errorMessage.ifEmpty { vm.result })
+                    }
+
+                    TextWithSelectedText(
+                        modifier = Modifier.padding(
+                            horizontal = mContentAppearance.horizontalMargin.dp,
+                            vertical = mContentAppearance.verticalMargin.dp
+                        ),
+                        value = text,
+                        onValueChange = { text = it },
+                        textStyle = MaterialTheme.typography.bodyMedium.copy(
+                            fontFamily = fontFamily(mContentAppearance.fontUri),
+                            fontSize = mContentAppearance.fontSize.sp,
+                            fontWeight = FontWeight(mContentAppearance.fontWeight),
+                            lineHeight = mContentAppearance.fontSize.sp * mContentAppearance.lineWidthScale,
+                            color = if (vm.errorMessage.isEmpty()) Color.Unspecified else MaterialTheme.colorScheme.error
+                        ),
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // GPT外观设置
-        if (gptAppearanceScreenVisible) GptAppearanceSettingsScreen(
-            Modifier
-                .animateContentSize()
-                .padding(horizontal = 2.dp),
-            titleAppearance = mTitleAppearance,
-            onTitleAppearanceChange = {
-                onTitleAppearanceChange(it)
-                mTitleAppearance = it
-            },
-            contentAppearance = mContentAppearance,
-            onContentAppearanceChange = {
-                onContentAppearanceChange(it)
-                mContentAppearance = it
-            },
-        )
-        val ffResolver = LocalFontFamilyResolver.current
-        fun fontFamily(uri: Uri): FontFamily {
-            try {
-                context.contentResolver.openFileDescriptor(uri, "r")?.use {
-                    return FontFamily(Font(it)).apply {
-                        ffResolver.resolve(this)
-                    }
-                }
-            } catch (_: Exception) {
-            }
-
-            return FontFamily.Default
+        Column(Modifier.fillMaxWidth()) {
+            PullRefreshIndicator(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                refreshing = refreshState.refreshing,
+                state = refreshState
+            )
         }
-        ExpandableText(
-            modifier = Modifier.padding(
-                horizontal = mTitleAppearance.horizontalMargin.dp,
-                vertical = mTitleAppearance.verticalMargin.dp
-            ),
-            text = message, style = MaterialTheme.typography.titleMedium,
-            fontFamily = fontFamily(mTitleAppearance.fontUri),
-            fontSize = mTitleAppearance.fontSize.sp,
-            lineHeight = mTitleAppearance.fontSize.sp * mTitleAppearance.lineWidthScale,
-            fontWeight = FontWeight(mTitleAppearance.fontWeight)
-        )
-
-        Box {
-            var text by remember { mutableStateOf(TextFieldValue(vm.errorMessage.ifEmpty { vm.result })) }
-            val localView = LocalView.current
-            val textToolbar = remember {
-                CustomTextToolbar(localView, onTtsRequested = {
-                    val selectedText = text.getSelectedText().text
-                    if (selectedText.isNotEmpty()) {
-                        context.startService(Intent(context, TtsService::class.java).apply {
-                            putExtra(TtsService.KEY_TTS_TEXT, selectedText)
-                            putExtra(TtsService.KEY_TTS_CONFIG, tts)
-                        })
-                    }
-                })
-            }
-
-            CompositionLocalProvider(LocalTextToolbar provides textToolbar) {
-                LaunchedEffect(key1 = vm.errorMessage, key2 = vm.result) {
-                    text = text.copy(text = vm.errorMessage.ifEmpty { vm.result })
-                }
-
-                TextWithSelectedText(
-                    modifier = Modifier.padding(
-                        horizontal = mContentAppearance.horizontalMargin.dp,
-                        vertical = mContentAppearance.verticalMargin.dp
-                    ),
-                    value = text,
-                    onValueChange = {
-                        text = it
-                    },
-                    textStyle = MaterialTheme.typography.bodyMedium.copy(
-                        fontFamily = fontFamily(mContentAppearance.fontUri),
-                        fontSize = mContentAppearance.fontSize.sp,
-                        fontWeight = FontWeight(mContentAppearance.fontWeight),
-                        lineHeight = mContentAppearance.fontSize.sp * mContentAppearance.lineWidthScale,
-                        color = if (vm.errorMessage.isEmpty()) Color.Unspecified else MaterialTheme.colorScheme.error
-                    ),
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
