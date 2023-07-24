@@ -6,13 +6,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.aallam.openai.api.exception.OpenAIAPIException
-import com.aallam.openai.api.exception.OpenAIException
-import com.aallam.openai.api.logging.Logger
-import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
-import com.aallam.openai.client.RetryStrategy
 import com.github.jing332.text_searcher.R
+import com.github.jing332.text_searcher.help.OpenAIHelper
 
 class ModelSelectionViewModel : ViewModel() {
     var models by mutableStateOf(listOf<String>())
@@ -23,9 +19,8 @@ class ModelSelectionViewModel : ViewModel() {
             throw Exception(context.getString(R.string.error_open_ai_api_key_empty))
         }
 
-        val openAi =
-            OpenAI(token, retry = RetryStrategy(1), logging = LoggingConfig(logger = Logger.Empty))
+        val openAI = OpenAI(OpenAIHelper.openAiConfig(token))
         models =
-            openAi.models().filter { it.id.id.contains("gpt-") }.map { it.id.id }.sortedBy { it }
+            openAI.models().filter { it.id.id.contains("gpt-") }.map { it.id.id }.sortedBy { it }
     }
 }

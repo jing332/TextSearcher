@@ -28,6 +28,12 @@ object AppConfig {
         initialValue = false
     )
 
+    var gptSocketTimeout = mutableDataSaverStateOf(
+        dataSaverInterface = dataSaverPref,
+        key = ConfigConst.KEY_GPT_SOCKET_TIMEOUT,
+        initialValue = 8L
+    )
+
     fun fillDefaultValues(context: Context) {
 //        if (systemPrompt.value.isEmpty())
 //            systemPrompt.value = context.getString(R.string.gpt_system_prompt)

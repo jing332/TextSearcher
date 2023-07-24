@@ -320,7 +320,7 @@ private fun TextStyleSettingsScreen(
         ) {
             Text(
                 stringResource(
-                    R.string.labe_vertical_margin,
+                    R.string.label_vertical_margin,
                     String.format("%.1f", verticalMargin)
                 )
             )

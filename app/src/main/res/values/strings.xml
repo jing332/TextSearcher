@@ -75,5 +75,7 @@
     <string name="search_windows_full_screen">搜索窗口全屏</string>
     <string name="search_window_full_screen_msg">开启后，搜索窗口将取消水平边距以全屏。</string>
     <string name="label_horizontal_margin">水平边距：%1$sdp</string>
-    <string name="labe_vertical_margin">垂直边距：%1$sdp</string>
+    <string name="label_vertical_margin">垂直边距：%1$sdp</string>
+    <string name="gpt_timeout">ChatGPT 超时</string>
+    <string name="gpt_timeout_msg">超过设定时间未响应后将取消请求</string>
 </resources>

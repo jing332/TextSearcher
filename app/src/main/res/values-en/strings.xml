@@ -75,6 +75,8 @@
     <string name="preference">Preferences</string>
     <string name="search_windows_full_screen">Search window full screen</string>
     <string name="search_window_full_screen_msg">When enabled, the search window will cancel the horizontal margin to be full screen.</string>
-    <string name="label_horizontal_margin">水平边距：%1$sdp</string>
-    <string name="labe_vertical_margin">垂直边距：%1$sdp</string>
+    <string name="label_horizontal_margin">Horizontal Margin：%1$sdp</string>
+    <string name="label_vertical_margin">Vertical Margin: %1$sdp</string>
+    <string name="gpt_timeout">ChatGPT Timeout</string>
+    <string name="gpt_timeout_msg">The request will be canceled after the set time without response</string>
 </resources>

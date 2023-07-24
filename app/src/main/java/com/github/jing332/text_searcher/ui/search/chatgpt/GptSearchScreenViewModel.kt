@@ -9,13 +9,10 @@ import com.aallam.openai.api.BetaOpenAI
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
-import com.aallam.openai.api.logging.LogLevel
-import com.aallam.openai.api.logging.Logger
 import com.aallam.openai.api.model.ModelId
-import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
-import com.aallam.openai.client.RetryStrategy
 import com.github.jing332.text_searcher.help.LocalTtsEngineHelper
+import com.github.jing332.text_searcher.help.OpenAIHelper
 import kotlinx.coroutines.isActive
 import kotlin.coroutines.coroutineContext
 
@@ -37,13 +34,7 @@ class GptSearchScreenViewModel : ViewModel() {
         systemPrompt: String,
         model: String
     ) {
-        val openAI = OpenAI(
-            token = token,
-            retry = RetryStrategy(0),
-            logging = LoggingConfig(logger = Logger.Empty, logLevel = LogLevel.None)
-            //timeout = Timeout(request = 8.seconds, connect = 8.seconds, socket = 8.seconds),
-//            proxy = ProxyConfig.Http("http://127.0.0.1:10801")
-        )
+        val openAI = OpenAI(OpenAIHelper.openAiConfig(token))
         val chatCompletionRequest = ChatCompletionRequest(
             model = ModelId(model),
             messages = listOf(
