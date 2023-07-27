@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-data class ChatGptTTS(
+data class TextToSpeechInfo(
     val isEnabled: Boolean = false,
 
     val engine: String = "",

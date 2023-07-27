@@ -13,7 +13,6 @@ import com.github.jing332.text_searcher.data.entites.SearchSource
 import com.github.jing332.text_searcher.ui.search.SearchSourceState
 import com.github.jing332.text_searcher.ui.search.chatgpt.GptSearchScreen
 import com.github.jing332.text_searcher.ui.search.chatgpt.GptSourceEditScreen
-import com.github.jing332.text_searcher.utils.ThrottleUtil
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -27,17 +26,17 @@ data class ChatGptSourceEntity(
     val systemPrompt: String = VALUE_SYSTEM_PROMPT,
     val messageTemplate: String = VALUE_MESSAGE_TEMPLATE,
 
-    val titleAppearance: ChatGptAppearance = ChatGptAppearance(
+    val titleAppearance: Appearance = Appearance(
         fontSize = VALUE_GPT_TITLE_FONT_SIZE,
         lineWidthScale = VALUE_GPT_TITLE_LINE_HEIGHT_SCALE
     ),
 
-    val contentAppearance: ChatGptAppearance = ChatGptAppearance(
+    val contentAppearance: Appearance = Appearance(
         fontSize = VALUE_GPT_FONT_SIZE,
         lineWidthScale = VALUE_GPT_LINE_HEIGHT_SCALE
     ),
 
-    val tts: ChatGptTTS = ChatGptTTS()
+    val tts: TextToSpeechInfo = TextToSpeechInfo()
 ) : SourceEntity() {
     companion object {
         const val VALUE_MODEL = "gpt-3.5-turbo"

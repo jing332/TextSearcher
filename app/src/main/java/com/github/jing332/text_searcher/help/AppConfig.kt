@@ -28,6 +28,7 @@ object AppConfig {
         initialValue = false
     )
 
+    // Unit: second
     var gptSocketTimeout = mutableDataSaverStateOf(
         dataSaverInterface = dataSaverPref,
         key = ConfigConst.KEY_GPT_SOCKET_TIMEOUT,

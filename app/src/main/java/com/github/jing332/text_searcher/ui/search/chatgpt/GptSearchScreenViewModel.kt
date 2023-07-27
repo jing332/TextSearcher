@@ -13,18 +13,13 @@ import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
 import com.github.jing332.text_searcher.help.LocalTtsEngineHelper
 import com.github.jing332.text_searcher.help.OpenAIHelper
+import com.github.jing332.text_searcher.ui.search.base.SimpleSearchViewModel
 import kotlinx.coroutines.isActive
 import kotlin.coroutines.coroutineContext
 
-class GptSearchScreenViewModel : ViewModel() {
-    var result by mutableStateOf("")
-    var errorMessage by mutableStateOf("")
-
-    var isLoading by mutableStateOf(false)
-
-    private var mTtsEngine: LocalTtsEngineHelper? = null
+class GptSearchScreenViewModel : SimpleSearchViewModel() {
     fun load(context: Context) {
-        mTtsEngine = mTtsEngine ?: LocalTtsEngineHelper(context)
+
     }
 
     @OptIn(BetaOpenAI::class)

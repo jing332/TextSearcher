@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "TextSearcher"
 include(":app")
+include(":modules:rhino1.7.3")

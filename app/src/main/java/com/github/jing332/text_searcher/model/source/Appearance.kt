@@ -16,7 +16,7 @@ import kotlinx.serialization.encoding.Encoder
 
 @Parcelize
 @Serializable
-data class ChatGptAppearance(
+data class Appearance(
     @Serializable(UriSerializer::class)
     val fontUri: Uri = Uri.EMPTY,
 

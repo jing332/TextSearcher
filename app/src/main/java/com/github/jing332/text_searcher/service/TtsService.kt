@@ -6,7 +6,7 @@ import android.os.IBinder
 import android.os.SystemClock
 import android.util.Log
 import com.github.jing332.text_searcher.help.LocalTtsEngineHelper
-import com.github.jing332.text_searcher.model.source.ChatGptTTS
+import com.github.jing332.text_searcher.model.source.TextToSpeechInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -17,7 +17,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 class TtsService : Service() {
@@ -32,7 +31,7 @@ class TtsService : Service() {
 
     private var scope = CoroutineScope(Dispatchers.IO + Job())
     private var mTtsEngine: LocalTtsEngineHelper? = null
-    private val channel = Channel<Pair<String, ChatGptTTS>>(Channel.UNLIMITED)
+    private val channel = Channel<Pair<String, TextToSpeechInfo>>(Channel.UNLIMITED)
 
     // 超时自动关闭服务
     private var mLastUpdateTime: Long = 0L
@@ -91,7 +90,7 @@ class TtsService : Service() {
 
     @Suppress("DEPRECATION")
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        val config: ChatGptTTS? = intent.getParcelableExtra(KEY_TTS_CONFIG)
+        val config: TextToSpeechInfo? = intent.getParcelableExtra(KEY_TTS_CONFIG)
         val text = intent.getStringExtra(KEY_TTS_TEXT) ?: ""
         Log.d(TAG, "onStartCommand: $config $text")
         scope.launch { channel.send(Pair(text, config!!)) }

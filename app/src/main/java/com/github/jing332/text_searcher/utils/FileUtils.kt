@@ -8,6 +8,20 @@ import java.io.File
 import java.io.InputStream
 
 object FileUtils {
+    fun exists(file: File): Boolean {
+        runCatching {
+            if (file.isFile)
+                return file.exists()
+        }.onFailure {
+            it.printStackTrace()
+        }
+        return false
+    }
+
+    fun exists(filePath: String): Boolean {
+        return exists(File(filePath))
+    }
+
     fun Uri.readAllText(context: Context): String {
         return when (scheme) {
             ContentResolver.SCHEME_CONTENT -> {

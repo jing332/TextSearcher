@@ -78,4 +78,5 @@
     <string name="label_vertical_margin">垂直边距：%1$sdp</string>
     <string name="gpt_timeout">ChatGPT 超时</string>
     <string name="gpt_timeout_msg">超过设定时间未响应后将取消请求</string>
+    <string name="plugin_bad_format">版本格式错误</string>
 </resources>

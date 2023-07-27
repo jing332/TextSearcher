@@ -86,7 +86,6 @@ private fun ContentScreen(modifier: Modifier) {
             }
         )
 
-
         var gptSocketTimeout by remember { AppConfig.gptSocketTimeout }
         PreferenceSlider(
             title = { Text(stringResource(R.string.gpt_timeout)) },

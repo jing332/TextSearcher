@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.jing332.text_searcher.R
-import com.github.jing332.text_searcher.model.source.ChatGptTTS
+import com.github.jing332.text_searcher.model.source.TextToSpeechInfo
 import com.github.jing332.text_searcher.ui.search.BaseSearchDialog
 import com.github.jing332.text_searcher.ui.widgets.ExposedDropTextField
 import com.github.jing332.text_searcher.ui.widgets.LabelSlider
@@ -49,8 +49,8 @@ import java.util.Locale
 fun TtsSettingsDialog(
     onDismissRequest: () -> Unit,
 
-    tts: ChatGptTTS,
-    onTtsChange: (ChatGptTTS) -> Unit,
+    tts: TextToSpeechInfo,
+    onTtsChange: (TextToSpeechInfo) -> Unit,
 
     // testText 为空时使用 message
     message: String,
@@ -109,12 +109,12 @@ fun TtsSettingsDialog(
 
 @Composable
 private fun TtsSettingsContent(
-    tts: ChatGptTTS,
+    tts: TextToSpeechInfo,
     // testText 为空时使用 message
     message: String,
     testText: String,
     onTestTextChange: (String) -> Unit,
-    onTtsChange: (ChatGptTTS) -> Unit,
+    onTtsChange: (TextToSpeechInfo) -> Unit,
     vm: TtsSettingsViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -240,7 +240,7 @@ private fun TtsSettingsContent(
 @Composable
 private fun TtsSettingsPreview() {
     var show by remember { mutableStateOf(true) }
-    var tts by remember { mutableStateOf(ChatGptTTS()) }
+    var tts by remember { mutableStateOf(TextToSpeechInfo()) }
     var testText by remember { mutableStateOf("test") }
     if (show)
         TtsSettingsDialog(

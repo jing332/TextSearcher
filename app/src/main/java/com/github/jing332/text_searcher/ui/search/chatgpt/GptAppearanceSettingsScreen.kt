@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
 import com.github.jing332.text_searcher.R
-import com.github.jing332.text_searcher.model.source.ChatGptAppearance
+import com.github.jing332.text_searcher.model.source.Appearance
 import com.github.jing332.text_searcher.ui.search.FontSelectionDialog
 import com.github.jing332.text_searcher.ui.search.TabIndicator
 import com.github.jing332.text_searcher.ui.widgets.LabelSlider
@@ -54,11 +54,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun GptAppearanceSettingsScreen(
     modifier: Modifier = Modifier,
-    titleAppearance: ChatGptAppearance,
-    onTitleAppearanceChange: (ChatGptAppearance) -> Unit,
+    titleAppearance: Appearance,
+    onTitleAppearanceChange: (Appearance) -> Unit,
 
-    contentAppearance: ChatGptAppearance,
-    onContentAppearanceChange: (ChatGptAppearance) -> Unit,
+    contentAppearance: Appearance,
+    onContentAppearanceChange: (Appearance) -> Unit,
 ) {
     OutlinedCard(modifier) {
         val scope = rememberCoroutineScope()

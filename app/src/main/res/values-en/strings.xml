@@ -79,4 +79,5 @@
     <string name="label_vertical_margin">Vertical Margin: %1$sdp</string>
     <string name="gpt_timeout">ChatGPT Timeout</string>
     <string name="gpt_timeout_msg">The request will be canceled after the set time without response</string>
+    <string name="plugin_bad_format">版本格式错误</string>
 </resources>

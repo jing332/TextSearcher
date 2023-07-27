@@ -109,7 +109,7 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/*"
         }
     }
 
@@ -123,9 +123,12 @@ android {
 }
 
 dependencies {
+    implementation(project(path= ":modules:rhino1.7.3"))
     // Room
     ksp("androidx.room:room-compiler:${Versions.room}")
     implementation("androidx.room:room-ktx:${Versions.room}")
+
+    implementation("cn.hutool:hutool-crypto:5.8.19")
 
     // OpenAI
     implementation("com.aallam.openai:openai-client:3.3.1")
